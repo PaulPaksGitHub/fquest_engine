@@ -1,0 +1,27 @@
+character me (name: "Я", assetPath: "curator/curator.png")
+
+scene start {
+    anchor init
+
+    bg "moscow.png"
+    show me
+
+    me "Привет"
+        - "Как дела?" {
+                bg "curator_office.png"
+                hide me
+                me "Продолжим"
+                jump second
+        }
+        - "Как дела 2?" {
+            me "OMG"
+            jump init
+        }
+
+    bg "moscow.png"
+};
+
+scene second {
+    me "Sebasa"
+    jump start
+}
