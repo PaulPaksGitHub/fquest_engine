@@ -12,6 +12,9 @@ import 'package:fquest_engine/cmp/ast/nodes/hide/HideNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/if/IfNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/jump/JumpNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/num/NumNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/pause/PauseNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/play/PlayNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/player/PlayerNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/prog/ProgNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/return/ReturnNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/scene/SceneNode.dart';
@@ -21,11 +24,12 @@ import 'package:fquest_engine/cmp/ast/nodes/str/StrNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/var/VarNode.dart';
 import 'package:fquest_engine/engine/ast/interpreter/interruptService/InterruptService.dart';
 import 'package:fquest_engine/engine/ast/interpreter/models/EvalResult.dart';
-import 'package:fquest_engine/engine/loaders/GSAssetLoader.dart';
 import 'package:fquest_engine/engine/scene/entities/CharacterEntity.dart';
 import 'package:fquest_engine/engine/scene/entities/SceneEntity.dart';
 import 'package:fquest_engine/engine/scene/entities/SpeechEntity.dart';
 import 'package:fquest_engine/engine/scene/state/GSGlobalState.dart';
+import 'package:fquest_engine/engine/services/player/PlayerService.dart';
+import 'package:fquest_engine/engine/story/Story.dart';
 
 import '../../scene/state/GSState.dart';
 import 'environment/Environment.dart';
@@ -182,6 +186,8 @@ class Interpreter {
               return res;
             }
           }
+
+          evalNext();
         }
 
         return EvalResult(value: true);
@@ -208,7 +214,7 @@ class Interpreter {
         final characterEntity = ref
             .read(GSState.characters.notifier)
             .getAssigned((node as ShowNode).characterVarName);
-        ref.read(GSState.characters.notifier).show(characterEntity);
+        ref.read(GSState.characters.notifier).show(characterEntity, node);
         return EvalResult(value: true);
       case ENodeType.SPEECH:
         final speech = node as SpeechNode;
@@ -224,14 +230,35 @@ class Interpreter {
       case ENodeType.ANCHOR:
         return EvalResult(value: true);
       case ENodeType.JUMP:
-        interruptService.jumpToAnchor((node as JumpNode).label);
-        evalNext();
-        return EvalResult(value: true);
+        final scenes = ref.read(Story.prog.notifier).state?.scenes;
+        final label = (node as JumpNode).label;
+
+        if (scenes != null && scenes.contains(label)) {
+          final scene = await ref.read(Story.prog.notifier).loadScene(label);
+          eval(scene, env);
+        } else {
+          interruptService.jumpToAnchor(label);
+          evalNext();
+        }
+
+        return EvalResult(value: true, isInterrupt: true);
       case ENodeType.HIDE:
         final characterEntity = ref
             .read(GSState.characters.notifier)
             .getAssigned((node as HideNode).characterVarName);
         ref.read(GSState.characters.notifier).hide(characterEntity);
+        return EvalResult(value: true);
+      case ENodeType.PLAYER:
+        PlayerService.add(node as PlayerNode);
+        return EvalResult(value: true);
+      case ENodeType.PLAY:
+        final playNode = node as PlayNode;
+        final player = PlayerService.get(playNode.playerLabel);
+        player?.play(playNode.assetPath);
+        return EvalResult(value: true);
+      case ENodeType.PAUSE:
+        final player = PlayerService.get((node as PauseNode).playerLabel);
+        player?.pause();
         return EvalResult(value: true);
     }
   }

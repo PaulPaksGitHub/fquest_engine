@@ -1,30 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fquest_engine/engine/scene/actions/GSActionDispatcher.dart';
-import 'package:fquest_engine/engine/scene/actions/params/character/HideCharacterAction.dart';
+import 'package:fquest_engine/cmp/ast/nodes/show/ShowNode.dart';
 import 'package:fquest_engine/engine/scene/entities/DialogOptionEntity.dart';
 import 'package:fquest_engine/engine/scene/entities/SpeechEntity.dart';
 
-import '../../character/Character.dart';
 import '../entities/CharacterEntity.dart';
-import '../../loaders/GSAssetLoader.dart';
-import '../actions/GSActionResult.dart';
-import '../actions/GSActionsProcessor.dart';
-import '../actions/GSActionsTimeline.dart';
-import '../actions/dialog/GSDialogOption.dart';
-import '../actions/params/SpeechAction.dart';
-import '../actions/params/assign/AssignCharacterAction.dart';
-import '../actions/params/character/ShowCharacterAction.dart';
 import 'GSGlobalState.dart';
 
 class BackgroundImageAssetPath extends StateNotifier<String?> {
   BackgroundImageAssetPath() : super(null);
 
   void setBackground(String nextPath) => {state = nextPath};
-}
-
-class _ActionsProcessor extends StateNotifier<GSActionsProcessor> {
-  _ActionsProcessor() : super(GSActionsProcessor());
 }
 
 class _Speech extends StateNotifier<SpeechEntity?> {
@@ -94,8 +80,13 @@ class _Characters extends StateNotifier<List<CharacterEntity>> {
     state = [...state];
   }
 
-  Future show(CharacterEntity characterEntity) async {
+  Future show(CharacterEntity characterEntity, ShowNode showNode) async {
     hide(characterEntity);
+
+    if (showNode.props.position != null) {
+      characterEntity.position.merge(showNode.props.position!);
+    }
+
     state.add(characterEntity);
     // Workaround
     state = [...state];
@@ -117,11 +108,6 @@ class GSState {
     return BackgroundImageAssetPath();
   });
 
-  static final actionsProcessor =
-      StateNotifierProvider<_ActionsProcessor, GSActionsProcessor>((ref) {
-    return _ActionsProcessor();
-  });
-
   static final speech = StateNotifierProvider<_Speech, SpeechEntity?>((ref) {
     return _Speech();
   });
@@ -129,33 +115,6 @@ class GSState {
   static final sceneName = StateNotifierProvider<_SceneName, String?>((ref) {
     return _SceneName();
   });
-
-  static nextAction(BuildContext context, WidgetRef ref) async {
-/*
-    final timeline =
-        ref.read(GSState.actionsProcessor.notifier).state.getTimeline();
-
-    if (timeline != null) {
-      final lastActivatedActionIndex = timeline.lastDispatchedIndex;
-      final actions = timeline.actionsTimeline;
-
-      for (var i = lastActivatedActionIndex + 1; i < actions.length; i++) {
-        var currentAction = actions[i];
-        print("Process Action index $i ${currentAction.actionType}");
-
-        timeline.setLastDispatchedIndex(i);
-        GSActionResult result = await GSActionDispatcher().dispatchAction(ref, currentAction);
-
-        if (result.isInterrupt && result.status == EActionStatus.DISPATCHED) {
-          if (result.launchNextRecursive) {
-            nextAction(context, ref);
-          }
-          break;
-        }
-      }
-    }
-*/
-  }
 
   static shouldUpdateScene(WidgetRef ref, String currentSceneName) {
     final sceneId = ref.read(GSState.sceneName.notifier).state;

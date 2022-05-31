@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:fquest_engine/cmp/AssetPath.dart';
 import 'package:fquest_engine/cmp/AstParser.dart';
 import 'package:fquest_engine/cmp/ast/global/GlobalNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/base/BaseNode.dart';
@@ -29,6 +30,8 @@ void main(List<String> args) async {
       scenes.add(node as SceneNode);
     }
   }
+
+  await fileService.cleanBuild();
 
   for (var scene in scenes) {
     sceneNames.add(scene.name);

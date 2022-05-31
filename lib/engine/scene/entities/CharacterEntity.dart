@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fquest_engine/cmp/ast/nodes/base/BaseNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/character/CharacterNode.dart';
-import 'package:fquest_engine/cmp/ast/nodes/str/StrNode.dart';
-import 'package:fquest_engine/engine/ast/interpreter/environment/Environment.dart';
 import 'package:fquest_engine/engine/ast/interpreter/models/EvalResult.dart';
 import 'package:fquest_engine/engine/character/Position.dart';
 
 import '../../character/Character.dart';
-import '../../loaders/GSAssetLoader.dart';
 
 class CharacterEntity {
   late CharacterNode characterNode;
@@ -29,14 +26,6 @@ class CharacterEntity {
 
       entity.size =
           Size(decodedImage.width.toDouble(), decodedImage.height.toDouble());
-
-/*
-      if (characterNode.props != null) {
-        if (characterNode.props!['left'] != null) {
-          entity.position.left = character.props!['left'];
-        }
-      }
-*/
     }
 
     return entity;

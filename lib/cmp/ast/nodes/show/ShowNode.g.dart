@@ -8,11 +8,13 @@ part of 'ShowNode.dart';
 
 ShowNode _$ShowNodeFromJson(Map<String, dynamic> json) => ShowNode(
       characterVarName: json['characterVarName'] as String,
+      props: ShowNodeProps.fromJson(json['props'] as Map<String, dynamic>),
     )..type = $enumDecode(_$ENodeTypeEnumMap, json['type']);
 
 Map<String, dynamic> _$ShowNodeToJson(ShowNode instance) => <String, dynamic>{
       'type': _$ENodeTypeEnumMap[instance.type],
       'characterVarName': instance.characterVarName,
+      'props': instance.props.toJson(),
     };
 
 const _$ENodeTypeEnumMap = {
@@ -37,4 +39,7 @@ const _$ENodeTypeEnumMap = {
   ENodeType.DIALOG_OPTION: 'DIALOG_OPTION',
   ENodeType.ANCHOR: 'ANCHOR',
   ENodeType.JUMP: 'JUMP',
+  ENodeType.PLAYER: 'PLAYER',
+  ENodeType.PLAY: 'PLAY',
+  ENodeType.PAUSE: 'PAUSE',
 };

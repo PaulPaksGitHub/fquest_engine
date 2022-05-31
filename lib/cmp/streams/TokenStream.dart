@@ -14,7 +14,7 @@ class TokenStream {
   }
 
   bool isDigit(String char){
-    return RegExp(r'^[0-9]+$').hasMatch(char);
+    return RegExp(r'^\d+$').hasMatch(char);
   }
 
   bool isIdStart(String char) {
@@ -22,15 +22,15 @@ class TokenStream {
   }
 
   bool isId(String char) {
-    return isIdStart(char) || RegExp(r'[0-9]').hasMatch(char);
+    return isIdStart(char) || RegExp(r'\d').hasMatch(char);
   }
 
   bool isOperation(String char) {
-    return RegExp(r'[\+\-\*/&|<>!=]').hasMatch(char);
+    return RegExp(r'[+\-*/&|<>!=]').hasMatch(char);
   }
 
   bool isPunctuation(String char) {
-    return RegExp(r'[,;:\(\)\{\}\[\]]').hasMatch(char);
+    return RegExp(r'[,;:(){\}\[\]]').hasMatch(char);
   }
 
   bool isWhitespace(String char) {

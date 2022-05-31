@@ -26,7 +26,10 @@ enum ENodeType {
   SPEECH,
   DIALOG_OPTION,
   ANCHOR,
-  JUMP
+  JUMP,
+  PLAYER,
+  PLAY,
+  PAUSE
 }
 
 @JsonSerializable()

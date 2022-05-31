@@ -14,6 +14,9 @@ enum EKeyword {
   FALSE,
   FUNC,
   RETURN,
+  PLAYER,
+  PLAY,
+  PAUSE
 }
 
 const KeywordsMap = {
@@ -30,5 +33,8 @@ const KeywordsMap = {
   EKeyword.HIDE: 'hide',
   EKeyword.ANCHOR: 'anchor',
   EKeyword.JUMP: 'jump',
-  EKeyword.IF: 'if'
+  EKeyword.IF: 'if',
+  EKeyword.PLAYER: 'player',
+  EKeyword.PLAY: 'play',
+  EKeyword.PAUSE: 'pause',
 };

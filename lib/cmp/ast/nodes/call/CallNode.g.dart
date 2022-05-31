@@ -44,4 +44,7 @@ const _$ENodeTypeEnumMap = {
   ENodeType.DIALOG_OPTION: 'DIALOG_OPTION',
   ENodeType.ANCHOR: 'ANCHOR',
   ENodeType.JUMP: 'JUMP',
+  ENodeType.PLAYER: 'PLAYER',
+  ENodeType.PLAY: 'PLAY',
+  ENodeType.PAUSE: 'PAUSE',
 };

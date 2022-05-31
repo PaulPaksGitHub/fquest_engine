@@ -5,9 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fquest_engine/engine/scene/state/GSGlobalState.dart';
 import 'package:fquest_engine/engine/scene/state/GSState.dart';
 import 'package:fquest_engine/engine/scene/widgets/DialogOptionsWidget.dart';
-import 'package:fquest_engine/engine/story/Story.dart';
 
-import 'actions/GSActionsTimeline.dart';
 import 'widgets/BackgroundImageWidget.dart';
 import 'widgets/CharacterNameWidget.dart';
 import 'widgets/CharactersSurfaceWidget.dart';

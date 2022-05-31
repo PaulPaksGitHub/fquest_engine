@@ -12,6 +12,9 @@ import 'package:fquest_engine/cmp/ast/nodes/hide/HideNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/if/IfNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/jump/JumpNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/num/NumNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/pause/PauseNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/play/PlayNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/player/PlayerNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/prog/ProgNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/return/ReturnNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/scene/SceneNode.dart';
@@ -85,6 +88,12 @@ class BaseNodeConverter<T> implements JsonConverter<T, Object?> {
           return JumpNode.fromJson(json) as T;
         case ENodeType.HIDE:
           return HideNode.fromJson(json) as T;
+        case ENodeType.PLAYER:
+          return PlayerNode.fromJson(json) as T;
+        case ENodeType.PLAY:
+          return PlayNode.fromJson(json) as T;
+        case ENodeType.PAUSE:
+          return PauseNode.fromJson(json) as T;
       }
     }
 

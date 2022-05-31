@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fquest_engine/cmp/AssetPath.dart';
 import 'package:fquest_engine/cmp/ast/nodes/anchor/AnchorNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/assign/AssignNode.dart';
@@ -8,15 +10,20 @@ import 'package:fquest_engine/cmp/ast/nodes/bool/BoolNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/call/CallNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/character/CharacterNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/dialog/option/DialogOptionNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/dialog/option/props/DialogOptionNodeProps.dart';
 import 'package:fquest_engine/cmp/ast/nodes/func/FuncNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/hide/HideNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/if/IfNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/jump/JumpNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/num/NumNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/pause/PauseNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/play/PlayNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/player/PlayerNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/prog/ProgNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/return/ReturnNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/scene/SceneNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/show/ShowNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/show/props/ShowNodeProps.dart';
 import 'package:fquest_engine/cmp/ast/nodes/speech/SpeechNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/str/StrNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/var/VarNode.dart';
@@ -25,6 +32,7 @@ import 'package:fquest_engine/cmp/parsers/base/BaseParser.dart';
 import 'package:fquest_engine/cmp/streams/Keywords.dart';
 import 'package:fquest_engine/cmp/streams/Token.dart';
 import 'package:fquest_engine/cmp/streams/TokenStream.dart';
+import 'package:fquest_engine/engine/character/Position.dart';
 
 class AstParser extends BaseParser {
   AstParser({required TokenStream tokenStream})
@@ -91,7 +99,7 @@ class AstParser extends BaseParser {
 
   Future<BaseNode> maybeCall(Future<BaseNode> Function() expr) async {
     final node = await expr();
-    if (helper.isPunc('(') != null) {
+    if (helper.isPunc('(') != null && node.type == ENodeType.VAR) {
       return await parseCall(node);
     }
     return node;
@@ -121,12 +129,14 @@ class AstParser extends BaseParser {
     Map<String, BaseNode> res = {};
     final name = helper.parseVarName();
     helper.skipPunc(':');
+
     final value = await parseExpression();
+    
     res[name] = value;
     return res;
   }
 
-  Future<Map<String, BaseNode>>  parseProps () async {
+  Future<Map<String, BaseNode>> parseProps () async {
     Map<String, BaseNode> res = {};
     final props = await helper.delimited(start: '(', stop: ')',separator: ',', parser: parseProp);
     for (final p in props) {
@@ -156,8 +166,17 @@ class AstParser extends BaseParser {
     while (tokenStream.peek()?.value == '-') {
       helper.skipOperation('-');
       final text = await parseAtom();
+
+      final props = DialogOptionNodeProps();
+
+      if (helper.isPunc('(') != null) {
+        final parsedProps = await parseProps();
+        props.onceSelectable = parsedProps['onceSelectable'] != null ? (parsedProps['onceSelectable'] as BoolNode).value : null;
+        props.condition = parsedProps['condition'];
+      }
+
       final onSelectProg = await parseAtom();
-      options.add(DialogOptionNode(text: text, onSelectProg: onSelectProg));
+      options.add(DialogOptionNode(text: text, onSelectProg: onSelectProg, props: props));
     }
     return options;
   }
@@ -179,6 +198,45 @@ class AstParser extends BaseParser {
     return JumpNode(label: helper.parseVarName());
   }
 
+  Future<ShowNode> parseShow() async {
+    helper.skipKeyword(KeywordsMap[EKeyword.SHOW]);
+    final characterVarName = helper.parseVarName();
+    final showNodeProps = ShowNodeProps();
+
+    if (helper.isPunc('(') != null) {
+      final props = await parseProps();
+
+      showNodeProps.position = Position(
+          left: props['left'] != null ? (props['left'] as NumNode).value : null,
+          right: props['right'] != null ? (props['right'] as NumNode).value : null,
+          top: props['top'] != null ? (props['top'] as NumNode).value : null,
+          bottom: props['bottom'] != null ? (props['bottom'] as NumNode).value : null,
+      );
+    }
+
+    return ShowNode(characterVarName: characterVarName, props: showNodeProps);
+  }
+
+  Future<PlayerNode> parsePlayer() async {
+    helper.skipKeyword(KeywordsMap[EKeyword.PLAYER]);
+    final label = helper.parseVarName();
+    return PlayerNode(label: label);
+  }
+
+  Future<PlayNode> parsePlay() async {
+    helper.skipKeyword(KeywordsMap[EKeyword.PLAY]);
+    final playerLabel = helper.parseVarName();
+    final assetPathNode = await parseAtom();
+    String assetPath = AssetPath.SOUND + (assetPathNode as StrNode).value;
+    return PlayNode(assetPath: assetPath, playerLabel: playerLabel);
+  }
+
+  Future<PauseNode> parsePause() async {
+    helper.skipKeyword(KeywordsMap[EKeyword.PAUSE]);
+    final playerLabel = helper.parseVarName();
+    return PauseNode(playerLabel: playerLabel);
+  }
+
   Future<BaseNode> parseAtom() async {
     return await maybeCall(() async {
       if (helper.isPunc('(') != null) {
@@ -189,6 +247,15 @@ class AstParser extends BaseParser {
       }
       if (helper.isPunc('{') != null) {
         return await parseProg();
+      }
+      if (helper.isKeyword(KeywordsMap[EKeyword.PAUSE]) != null) {
+        return await parsePause();
+      }
+      if (helper.isKeyword(KeywordsMap[EKeyword.PLAYER]) != null) {
+        return await parsePlayer();
+      }
+      if (helper.isKeyword(KeywordsMap[EKeyword.PLAY]) != null) {
+        return await parsePlay();
       }
       if (helper.isKeyword(KeywordsMap[EKeyword.JUMP]) != null) {
         return await parseJump();
@@ -228,8 +295,7 @@ class AstParser extends BaseParser {
         return await parseCharacter();
       }
       if (helper.isKeyword(KeywordsMap[EKeyword.SHOW]) != null) {
-        tokenStream.next();
-        return ShowNode(characterVarName: helper.parseVarName());
+        return await parseShow();
       }
       if (helper.isKeyword(KeywordsMap[EKeyword.HIDE]) != null) {
         tokenStream.next();

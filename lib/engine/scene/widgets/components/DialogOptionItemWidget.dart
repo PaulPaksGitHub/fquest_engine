@@ -17,7 +17,7 @@ class DialogOptionItemWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (option.onceAvailable == true && option.wasSelected == true) {
+    if ((option.props.onceSelectable != null && option.props.onceSelectable == true && option.wasSelected == true) || !option.isAvailable) {
       return SizedBox.shrink();
     }
 

@@ -1,27 +1,30 @@
-character me (name: "Я", assetPath: "curator/curator.png")
+character me (name: "Z", assetPath: "curator/curator.png")
+
+player ambient
 
 scene start {
-    anchor init
 
-    bg "moscow.png"
-    show me
+    a = 0
 
+    pause ambient
     me "Привет"
-        - "Как дела?" {
-                bg "curator_office.png"
-                hide me
-                me "Продолжим"
-                jump second
-        }
-        - "Как дела 2?" {
-            me "OMG"
-            jump init
-        }
 
-    bg "moscow.png"
-};
+    anchor dia
+    me ";lkjlkjl"
+        - "qwqwe" (condition: a < 1) {
+            a = a + 1
+        }
+        - "qwqwewwwwwww" (onceSelectable: true) {
+            jump dia
+        }
+        - "hide me" {
+            jump hiding
+        }
+        
+    show me (left: 1000)
+    jump test
 
-scene second {
-    me "Sebasa"
-    jump start
+    anchor hiding
+    hide me
+    jump dia
 }

@@ -9,7 +9,6 @@ part 'Character.g.dart';
 class Character {
   String? name;
   String? assetPath;
-  Map<String, dynamic>? props;
 
   Character({this.name, this.assetPath});
 

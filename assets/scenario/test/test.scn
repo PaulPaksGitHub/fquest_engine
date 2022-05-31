@@ -1,0 +1,5 @@
+scene test {
+    play ambient "ambient/test.mp3"
+    me "Пока"
+    jump start
+}

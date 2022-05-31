@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fquest_engine/engine/loaders/GSAssetLoader.dart';
 
 import '../state/GSState.dart';
 
@@ -14,7 +13,7 @@ class BackgroundImageWidget extends ConsumerWidget {
         ref.watch(GSState.backgroundImageAssetPath);
     if (backgroundImageAssetPath != null) {
       return Image(
-          image: GSAssetLoader().loadBackground(backgroundImageAssetPath));
+          image: AssetImage(backgroundImageAssetPath));
     }
 
     return Container(color: Colors.deepPurple);

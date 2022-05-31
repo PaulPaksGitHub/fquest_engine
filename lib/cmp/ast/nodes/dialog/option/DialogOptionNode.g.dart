@@ -11,6 +11,8 @@ DialogOptionNode<T> _$DialogOptionNodeFromJson<T extends BaseNode>(
     DialogOptionNode<T>(
       text: BaseNodeConverter<T>().fromJson(json['text']),
       onSelectProg: BaseNodeConverter<T>().fromJson(json['onSelectProg']),
+      props: DialogOptionNodeProps<BaseNode>.fromJson(
+          json['props'] as Map<String, dynamic>),
     )..type = $enumDecode(_$ENodeTypeEnumMap, json['type']);
 
 Map<String, dynamic> _$DialogOptionNodeToJson<T extends BaseNode>(
@@ -19,6 +21,7 @@ Map<String, dynamic> _$DialogOptionNodeToJson<T extends BaseNode>(
       'type': _$ENodeTypeEnumMap[instance.type],
       'text': BaseNodeConverter<T>().toJson(instance.text),
       'onSelectProg': BaseNodeConverter<T>().toJson(instance.onSelectProg),
+      'props': instance.props.toJson(),
     };
 
 const _$ENodeTypeEnumMap = {
@@ -43,4 +46,7 @@ const _$ENodeTypeEnumMap = {
   ENodeType.DIALOG_OPTION: 'DIALOG_OPTION',
   ENodeType.ANCHOR: 'ANCHOR',
   ENodeType.JUMP: 'JUMP',
+  ENodeType.PLAYER: 'PLAYER',
+  ENodeType.PLAY: 'PLAY',
+  ENodeType.PAUSE: 'PAUSE',
 };

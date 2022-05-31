@@ -30,11 +30,11 @@ class _InterpreterNotifier extends StateNotifier<Interpreter?> {
 
   init (BuildContext context, WidgetRef ref) async {
     state = Interpreter(ref: ref, context: context);
-    final prog = await ref.read(Story.prog.notifier).loadProg();
+    final global = await ref.read(Story.prog.notifier).loadInitialProg();
 
     globalEnv.def('print', print);
 
-    state!.eval(prog, globalEnv);
+    state!.eval(global.topLevelNode, globalEnv);
   }
 }
 

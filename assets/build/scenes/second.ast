@@ -1,1 +1,0 @@
-{"type":"SCENE","name":"second","prog":{"type":"PROG","prog":[{"type":"SPEECH","characterVarName":"me","text":{"type":"STR","value":"Sebasa"},"dialogOptions":[]},{"type":"JUMP","label":"start"}],"anchors":{},"usedAssets":[]}}
