@@ -67,7 +67,7 @@ class _Characters extends StateNotifier<List<CharacterEntity>> {
     throw Exception('Character $label is\'n assigned');
   }
 
-  void removeAll() {
+  void hideAll() {
     state = [];
   }
 

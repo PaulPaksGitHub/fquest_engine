@@ -18,6 +18,7 @@ dependencies:
   flutter_svg: ^1.0.3
   json_annotation: ^4.4.0
   just_audio: ^0.9.24
+  just_audio_libwinmedia: ^0.0.4
 
 dev_dependencies:
   build_runner: ^2.0.0

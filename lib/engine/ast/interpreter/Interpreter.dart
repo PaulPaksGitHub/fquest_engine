@@ -243,10 +243,17 @@ class Interpreter {
 
         return EvalResult(value: true, isInterrupt: true);
       case ENodeType.HIDE:
-        final characterEntity = ref
-            .read(GSState.characters.notifier)
-            .getAssigned((node as HideNode).characterVarName);
-        ref.read(GSState.characters.notifier).hide(characterEntity);
+        node as HideNode;
+
+        if (node.characterVarName == 'all') {
+          ref.read(GSState.characters.notifier).hideAll();
+        } else {
+          final characterEntity = ref
+              .read(GSState.characters.notifier)
+              .getAssigned(node.characterVarName);
+          ref.read(GSState.characters.notifier).hide(characterEntity);
+        }
+
         return EvalResult(value: true);
       case ENodeType.PLAYER:
         PlayerService.add(node as PlayerNode);

@@ -20,7 +20,7 @@ scene start {
         - "hide me" {
             jump hiding
         }
-        
+
     show me (left: 1000)
     jump test
 
