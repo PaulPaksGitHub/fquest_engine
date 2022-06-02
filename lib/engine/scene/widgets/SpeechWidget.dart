@@ -1,18 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fquest_engine/engine/scene/entities/SpeechEntity.dart';
+import 'package:fquest_engine/engine/services/animation/AnimationScheduler.dart';
 
 import '../../styles/ColorsScheme.dart';
 import '../state/GSState.dart';
 
-class SpeechWidget extends ConsumerWidget {
-  SpeechWidget({required this.computeSize});
+class SpeechWidget extends ConsumerStatefulWidget {
+  const SpeechWidget({Key? key, required this.computeSize}) : super(key: key);
 
-  double Function(double) computeSize;
+  final double Function(double) computeSize;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _SpeechWidgetState();
+  }
+}
+
+class _SpeechWidgetState extends ConsumerState<SpeechWidget> {
+  String speechText = '';
+
+  SpeechEntity? currentSpeech;
+
+  setText(SpeechEntity? entity) async {
+    if (entity != null) {
+      setState((){ speechText = ''; });
+      currentSpeech = entity;
+
+      AnimationScheduler.scheduleAnimation('speechText', true);
+
+      for (int i = 0; i < entity.text.length; i++) {
+        if (entity != currentSpeech || speechText.length >= entity.text.length) return;
+
+        final symbol = entity.text[i];
+        await Future.delayed(const Duration(milliseconds: 15), () async {
+          final needSetFull = AnimationScheduler.getAnimation('speechTextSetFull');
+
+          if (needSetFull != null && needSetFull) {
+            setState(() {
+              if (entity == currentSpeech) {
+                speechText = entity.text;
+              }
+            });
+          } else {
+            setState((){
+              if (entity == currentSpeech) {
+                speechText += symbol;
+              }
+            });
+          }
+
+        });
+      }
+
+      AnimationScheduler.getAnimation('speechText');
+    }
+  }
+
+  @override
+  initState () {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final speech = ref.watch(GSState.speech);
+    final computeSize = widget.computeSize;
+
+    ref.listen<SpeechEntity?>(GSState.speech, (previous, next) {
+      setText(next);
+    });
 
     if (speech != null) {
       return ConstrainedBox(
@@ -22,7 +80,7 @@ class SpeechWidget extends ConsumerWidget {
         ),
         child: Container(
           child: Text(
-            speech != null ? speech.text : '',
+            speechText,
             style: TextStyle(
               fontSize: computeSize(20.0),
               height: 30 / 20,

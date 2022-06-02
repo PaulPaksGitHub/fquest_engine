@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fquest_engine/engine/scene/state/GSGlobalState.dart';
 import 'package:fquest_engine/engine/scene/state/GSState.dart';
 import 'package:fquest_engine/engine/scene/widgets/DialogOptionsWidget.dart';
+import 'package:fquest_engine/engine/services/animation/AnimationScheduler.dart';
 
 import 'widgets/BackgroundImageWidget.dart';
 import 'widgets/CharacterNameWidget.dart';
@@ -34,10 +35,16 @@ class GoNextAction extends Action<GoNextIntent > {
 
   @override
   Object? invoke(covariant GoNextIntent intent) {
-    final speech = ref.read(GSState.speech.notifier).state;
-    if ((speech != null && speech.dialogOptions.isEmpty) ||
-        speech == null) {
-      ref.read(GSGlobalState.interpreter.notifier).state?.evalNext();
+    final isTextAnimationActive = AnimationScheduler.getAnimation('speechText');
+
+    if (isTextAnimationActive != null && isTextAnimationActive) {
+      AnimationScheduler.scheduleAnimation('speechTextSetFull', true);
+    } else {
+      final speech = ref.read(GSState.speech.notifier).state;
+      if ((speech != null && speech.dialogOptions.isEmpty) ||
+          speech == null) {
+        ref.read(GSGlobalState.interpreter.notifier).state?.evalNext();
+      }
     }
     return null;
   }
