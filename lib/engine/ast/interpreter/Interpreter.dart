@@ -247,6 +247,8 @@ class Interpreter {
 
         if (node.characterVarName == 'all') {
           ref.read(GSState.characters.notifier).hideAll();
+        } else if (node.characterVarName == 'dialog') {
+          ref.read(GSState.speech.notifier).set(null);
         } else {
           final characterEntity = ref
               .read(GSState.characters.notifier)

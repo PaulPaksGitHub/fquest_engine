@@ -1,0 +1,3 @@
+character narrator ()
+
+character curator (name: "Куратор", assetPath: "curator/curator.png")

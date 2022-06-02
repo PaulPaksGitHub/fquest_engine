@@ -16,7 +16,7 @@ class BackgroundImageAssetPath extends StateNotifier<String?> {
 class _Speech extends StateNotifier<SpeechEntity?> {
   _Speech() : super(null);
 
-  void set(SpeechEntity speech) {
+  void set(SpeechEntity? speech) {
     state = speech;
   }
 }

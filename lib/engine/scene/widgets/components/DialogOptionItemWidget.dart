@@ -47,7 +47,7 @@ class DialogOptionItemWidget extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   AnimatedContainer(
-                    duration: Duration(milliseconds: 170),
+                    duration: const Duration(milliseconds: 170),
                     width: computeSize(16.0),
                     height: computeSize(16.0),
                     decoration: BoxDecoration(
@@ -58,7 +58,7 @@ class DialogOptionItemWidget extends ConsumerWidget {
                     ),
                     margin: EdgeInsets.only(right: computeSize(12)),
                   ),
-                  Text(
+                  Expanded(child:                   Text(
                     option.title,
                     style: TextStyle(
                       fontSize: computeSize(20.0),
@@ -67,6 +67,7 @@ class DialogOptionItemWidget extends ConsumerWidget {
                       fontWeight: FontWeight.w600,
                       color: ColorsScheme.replicaText,
                     ),
+                  )
                   )
                 ],
               ),

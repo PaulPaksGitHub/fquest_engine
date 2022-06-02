@@ -1,30 +1,5 @@
-character me (name: "Z", assetPath: "curator/curator.png")
-
 player ambient
 
 scene start {
-
-    a = 0
-
-    pause ambient
-    me "Привет"
-
-    anchor dia
-    me ";lkjlkjl"
-        - "qwqwe" (condition: a < 1) {
-            a = a + 1
-        }
-        - "qwqwewwwwwww" (onceSelectable: true) {
-            jump dia
-        }
-        - "hide me" {
-            jump hiding
-        }
-
-    show me (left: 1000)
-    jump test
-
-    anchor hiding
-    hide me
-    jump dia
+    jump briefing
 }

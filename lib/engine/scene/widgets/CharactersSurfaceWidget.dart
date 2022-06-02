@@ -22,14 +22,16 @@ class CharactersSurfaceWidget extends ConsumerWidget {
         child: Stack(
           children: [for (var character in characters)
             character.character.assetPath != null ? Positioned(
-              bottom: 0,
                 left: computeSize(character.position.left ?? 0),
+                bottom: computeSize(character.position.bottom ?? 0),
+                top: character.position.bottom == null ? computeSize(character.position.top ?? 0) : null,
+                right: character.position.left == null ? computeSize(character.position.right ?? 0) : null,
                 child: SizedBox(
                   width: computeSize(character.size.width),
                   height: computeSize(character.size.height),
                   child: Image(image: AssetImage(character.character.assetPath!)),
                 )
-            ) : SizedBox.shrink()
+            ) : const SizedBox.shrink()
           ],
         ));
   }

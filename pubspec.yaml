@@ -33,9 +33,12 @@ flutter:
     - assets/build/
     - assets/build/scenes/
     - assets/background/
+    - assets/background/curator_office/
+    - assets/background/car/
     - assets/character/curator/
-    - assets/scenario/
+    - assets/character/personal_card/
     - assets/sounds/ambient/
+    - assets/scenario/
 
   fonts:
     - family: Montserrat

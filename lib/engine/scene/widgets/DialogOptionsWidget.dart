@@ -17,29 +17,28 @@ class DialogOptionsWidget extends ConsumerWidget {
 
     if (speech != null && speech.dialogOptions.isNotEmpty) {
       return Expanded(
-        flex: 1,
-        child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: computeSize(180.0),
-            ),
-            child: Container(
-                child: Wrap(
-                  runSpacing: computeSize(10.0),
-                  children: <Widget>[
-                    for (var i = 0; i < speech.dialogOptions.length; i++)
-                      DialogOptionItemWidget(
-                          computeSize: computeSize,
-                          option: speech.dialogOptions[i])
-                  ],
-                ),
-                decoration: BoxDecoration(
-                    color: ColorsScheme.replicaAreaBackground,
-                    borderRadius: BorderRadius.circular(5)),
-                padding: EdgeInsets.symmetric(vertical: computeSize(20.0)),
-                margin: EdgeInsets.only(left: computeSize(30.0)))),
-      );
+        flex: 557,
+          child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: computeSize(180.0),
+          ),
+          child: Container(
+              child: Wrap(
+                runSpacing: computeSize(10.0),
+                children: <Widget>[
+                  for (var i = 0; i < speech.dialogOptions.length; i++)
+                    DialogOptionItemWidget(
+                        computeSize: computeSize,
+                        option: speech.dialogOptions[i])
+                ],
+              ),
+              decoration: BoxDecoration(
+                  color: ColorsScheme.replicaAreaBackground,
+                  borderRadius: BorderRadius.circular(5)),
+              padding: EdgeInsets.symmetric(vertical: computeSize(20.0)),
+              margin: EdgeInsets.only(left: computeSize(30.0)))));
     }
 
-    return SizedBox.shrink();
+    return const SizedBox.shrink();
   }
 }

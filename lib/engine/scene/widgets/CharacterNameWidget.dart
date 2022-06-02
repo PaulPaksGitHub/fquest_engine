@@ -15,27 +15,24 @@ class CharacterNameWidget extends ConsumerWidget {
     final speech = ref.watch(GSState.speech);
 
     if (speech != null && speech.character.character.name != null) {
-      return (Container(
-        alignment: Alignment.bottomLeft,
-        child: Container(
-          decoration: BoxDecoration(
-              color: ColorsScheme.characterNameBackground,
-              borderRadius: BorderRadius.circular(5)),
-          padding: EdgeInsets.symmetric(
-              horizontal: computeSize(30.0), vertical: computeSize(20.0)),
-          margin: EdgeInsets.only(bottom: computeSize(10.0)),
-          child: Text(
-            speech.character.character.name!,
-            style: TextStyle(
-              fontSize: computeSize(24.0),
-              height: 30 / 24,
-              fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w600,
-              color: ColorsScheme.replicaText,
-            ),
+      return Container(
+        decoration: BoxDecoration(
+            color: ColorsScheme.characterNameBackground,
+            borderRadius: BorderRadius.circular(5)),
+        padding: EdgeInsets.symmetric(
+            horizontal: computeSize(30.0), vertical: computeSize(20.0)),
+        margin: EdgeInsets.only(bottom: computeSize(10.0)),
+        child: Text(
+          speech.character.character.name!,
+          style: TextStyle(
+            fontSize: computeSize(24.0),
+            height: 30 / 24,
+            fontFamily: 'Montserrat',
+            fontWeight: FontWeight.w600,
+            color: ColorsScheme.replicaText,
           ),
         ),
-      ));
+      );
     }
 
     return SizedBox.shrink();
