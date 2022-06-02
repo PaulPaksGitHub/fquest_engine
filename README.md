@@ -1,16 +1,25 @@
-# fquest_engine
+# FQuest_Enqine
+### FQuest_Enqine is the game engine for visual quests and novels.
 
-A new Flutter project.
+## Table of contents
+1. [Setup and launch](#setup-and-launch)
+2. [Introduction](#introduction)
 
-## Getting Started
+## Setup and launch 
+1. Install flutter on your machine according the official Flutter documentation.
+2. Run ```dart ./lib/cmp.dart``` in the project root folder to prepare game assets.
+3. Run ```flutter run``` in the same directory to launch the game.
 
-This project is a starting point for a Flutter application.
+## Introduction 
+### First game scene
+Open directory `assets/scenario` and then file `start.scn`. 
+Here you can see the entry point of your visual novel. Every time you make a change in .scn file, 
+you need run ```dart ./lib/cmp.dart``` to apply the changes in the game;
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Try to write you first scene. Just add ```me "I'm amazing"``` inside the scene block like this:
+```
+character me (name: "Me")
+scene start {
+    me "I'm amazing" <-- Put it here
+}
+```
