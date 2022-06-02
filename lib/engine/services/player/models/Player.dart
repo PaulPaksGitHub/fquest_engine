@@ -11,12 +11,12 @@ import '../../../../cmp/ast/nodes/player/PlayerNode.dart';
 class Player {
   PlayerNode node;
 
-  final AudioPlayer _player = AudioPlayer();
+  AudioPlayer _player = AudioPlayer();
   bool isPlaying = false;
 
   play (String assetPath, {bool loop = true}) async {
     if (isPlaying == true) {
-      _player.stop();
+      pause();
     }
 
     final asset = await rootBundle.load(assetPath);
@@ -25,16 +25,52 @@ class Player {
     await file.create(recursive: true);
     file.writeAsBytesSync(asset.buffer.asInt8List());
 
-    _player.setFilePath(file.path);
+    _player = AudioPlayer();
+    await _player.setFilePath(file.path);
     await _player.setLoopMode(loop ? LoopMode.all : LoopMode.off);
     isPlaying = true;
 
-    return await _player.play();
+    await _player.setVolume(0);
+    _player.play();
+    await smoothTurnOnVolume(_player, 12, 0);
+    return;
+  }
+
+  smoothTurnOnVolume(AudioPlayer p, int steps, int currentStep) async {
+    final nextVolume = p.volume > 0 ? p.volume * 1.2 : 0.1;
+
+    if (steps == currentStep || nextVolume > 1) {
+      p.setVolume(1);
+      return;
+    }
+
+    await Future.delayed(Duration(milliseconds: 75), () async {
+      await p.setVolume(nextVolume);
+    });
+
+    return await smoothTurnOnVolume(p, steps, currentStep + 1);
+  }
+
+  smoothTurnOffVolume(AudioPlayer p, int steps, {required int currentStep}) async {
+    if (steps == currentStep) {
+      p.setVolume(0);
+      return;
+    }
+
+    await Future.delayed(Duration(milliseconds: 75), () async {
+      await p.setVolume(p.volume * 0.85);
+    });
+
+    return await smoothTurnOffVolume(p, steps, currentStep: currentStep + 1);
   }
 
   pause () async {
     isPlaying = false;
-    return _player.pause();
+    final p = _player;
+    final volume = p.volume;
+    await smoothTurnOffVolume(p, 12, currentStep: 0);
+    await p.setVolume(volume);
+    return p.pause();
   }
 
   Player({required this.node});

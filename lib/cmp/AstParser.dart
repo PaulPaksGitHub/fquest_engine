@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:fquest_engine/cmp/AssetPath.dart';
 import 'package:fquest_engine/cmp/ast/nodes/anchor/AnchorNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/assign/AssignNode.dart';
@@ -24,6 +22,7 @@ import 'package:fquest_engine/cmp/ast/nodes/return/ReturnNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/scene/SceneNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/show/ShowNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/show/props/ShowNodeProps.dart';
+import 'package:fquest_engine/cmp/ast/nodes/show/props/animation/ShowNodeAnimation.dart';
 import 'package:fquest_engine/cmp/ast/nodes/speech/SpeechNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/str/StrNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/var/VarNode.dart';
@@ -51,8 +50,8 @@ class AstParser extends BaseParser {
   }
 
   Future<BaseNode> parseProg() async {
-    final prog = await helper.delimited(
-        start: '{', stop: '}', parser: parseExpression);
+    final prog =
+        await helper.delimited(start: '{', stop: '}', parser: parseExpression);
 
     return ProgNode(prog: prog, anchors: findProgAnchors(prog));
   }
@@ -125,20 +124,21 @@ class AstParser extends BaseParser {
     return BackgroundNode(assetPath: ap);
   }
 
-  Future<Map<String, BaseNode>> parseProp () async {
+  Future<Map<String, BaseNode>> parseProp() async {
     Map<String, BaseNode> res = {};
     final name = helper.parseVarName();
     helper.skipPunc(':');
 
     final value = await parseExpression();
-    
+
     res[name] = value;
     return res;
   }
 
-  Future<Map<String, BaseNode>> parseProps () async {
+  Future<Map<String, BaseNode>> parseProps() async {
     Map<String, BaseNode> res = {};
-    final props = await helper.delimited(start: '(', stop: ')',separator: ',', parser: parseProp);
+    final props = await helper.delimited(
+        start: '(', stop: ')', separator: ',', parser: parseProp);
     for (final p in props) {
       res.addAll(p);
     }
@@ -153,7 +153,8 @@ class AstParser extends BaseParser {
     characterNode.name = options['name'];
 
     if (options['assetPath'] != null) {
-      (options['assetPath'] as StrNode).value = AssetPath.CHARACTER + (options['assetPath'] as StrNode).value;
+      (options['assetPath'] as StrNode).value =
+          AssetPath.CHARACTER + (options['assetPath'] as StrNode).value;
       topLevelAssets.add((options['assetPath'] as StrNode).value);
     }
     characterNode.assetPath = options['assetPath'];
@@ -171,12 +172,15 @@ class AstParser extends BaseParser {
 
       if (helper.isPunc('(') != null) {
         final parsedProps = await parseProps();
-        props.onceSelectable = parsedProps['onceSelectable'] != null ? (parsedProps['onceSelectable'] as BoolNode).value : null;
+        props.onceSelectable = parsedProps['onceSelectable'] != null
+            ? (parsedProps['onceSelectable'] as BoolNode).value
+            : null;
         props.condition = parsedProps['condition'];
       }
 
       final onSelectProg = await parseAtom();
-      options.add(DialogOptionNode(text: text, onSelectProg: onSelectProg, props: props));
+      options.add(DialogOptionNode(
+          text: text, onSelectProg: onSelectProg, props: props));
     }
     return options;
   }
@@ -185,7 +189,8 @@ class AstParser extends BaseParser {
     final varname = characterVarName.value;
     final text = await parseAtom();
     final dialogOptions = await parseDialogOptions();
-    return SpeechNode(characterVarName: varname, text: text, dialogOptions: dialogOptions);
+    return SpeechNode(
+        characterVarName: varname, text: text, dialogOptions: dialogOptions);
   }
 
   Future<AnchorNode> parseAnchor() async {
@@ -198,22 +203,31 @@ class AstParser extends BaseParser {
     return JumpNode(label: helper.parseVarName());
   }
 
+  T? getPropValue<T>(BaseNode? node) {
+    return node != null ? node as T : null;
+  }
+
   Future<ShowNode> parseShow() async {
     helper.skipKeyword(KeywordsMap[EKeyword.SHOW]);
     final characterVarName = helper.parseVarName();
     final showNodeProps = ShowNodeProps();
+    final showNodeAnimation = ShowNodeAnimation();
 
     if (helper.isPunc('(') != null) {
       final props = await parseProps();
 
       showNodeProps.position = Position(
-          left: props['left'] != null ? (props['left'] as NumNode).value : null,
-          right: props['right'] != null ? (props['right'] as NumNode).value : null,
-          top: props['top'] != null ? (props['top'] as NumNode).value : null,
-          bottom: props['bottom'] != null ? (props['bottom'] as NumNode).value : null,
+        left: getPropValue<NumNode>(props['left'])?.value,
+        right: getPropValue<NumNode>(props['right'])?.value,
+        top: getPropValue<NumNode>(props['top'])?.value,
+        bottom: getPropValue<NumNode>(props['bottom'])?.value,
       );
+
+      showNodeAnimation.fadeInDuration =
+          getPropValue<NumNode>(props['fadeInDuration'])?.value;
     }
 
+    showNodeProps.animation = showNodeAnimation;
     return ShowNode(characterVarName: characterVarName, props: showNodeProps);
   }
 
@@ -305,7 +319,9 @@ class AstParser extends BaseParser {
       final token = tokenStream.next()!;
       final nextToken = tokenStream.peek();
 
-      if (nextToken != null && token.type == ETokenType.VAR && nextToken.type == ETokenType.STR) {
+      if (nextToken != null &&
+          token.type == ETokenType.VAR &&
+          nextToken.type == ETokenType.STR) {
         return await parseSpeech(token);
       }
 
@@ -383,6 +399,7 @@ class AstParser extends BaseParser {
       }
     }
 
-    return ProgNode(prog: prog, anchors: findProgAnchors(prog), usedAssets: topLevelAssets);
+    return ProgNode(
+        prog: prog, anchors: findProgAnchors(prog), usedAssets: topLevelAssets);
   }
 }

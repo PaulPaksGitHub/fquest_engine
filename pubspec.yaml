@@ -38,6 +38,7 @@ flutter:
     - assets/character/curator/
     - assets/character/personal_card/
     - assets/sounds/ambient/
+    - assets/sounds/music/
     - assets/scenario/
 
   fonts:

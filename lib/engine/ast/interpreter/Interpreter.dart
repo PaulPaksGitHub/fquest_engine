@@ -28,6 +28,7 @@ import 'package:fquest_engine/engine/scene/entities/CharacterEntity.dart';
 import 'package:fquest_engine/engine/scene/entities/SceneEntity.dart';
 import 'package:fquest_engine/engine/scene/entities/SpeechEntity.dart';
 import 'package:fquest_engine/engine/scene/state/GSGlobalState.dart';
+import 'package:fquest_engine/engine/services/animation/AnimationScheduler.dart';
 import 'package:fquest_engine/engine/services/player/PlayerService.dart';
 import 'package:fquest_engine/engine/story/Story.dart';
 
@@ -211,9 +212,15 @@ class Interpreter {
         ref.read(GSState.characters.notifier).assign(characterEntity);
         return EvalResult(value: true);
       case ENodeType.SHOW:
+        node as ShowNode;
         final characterEntity = ref
             .read(GSState.characters.notifier)
-            .getAssigned((node as ShowNode).characterVarName);
+            .getAssigned(node.characterVarName);
+
+        if (node.props.animation != null) {
+          AnimationScheduler.scheduleAnimation(characterEntity, node.props.animation);
+        }
+
         ref.read(GSState.characters.notifier).show(characterEntity, node);
         return EvalResult(value: true);
       case ENodeType.SPEECH:

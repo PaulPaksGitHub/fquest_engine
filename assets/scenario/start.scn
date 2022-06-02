@@ -1,5 +1,7 @@
 player ambient
+player music
 
 scene start {
+    play music "music/office.mp3"
     jump briefing
 }

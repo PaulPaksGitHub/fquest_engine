@@ -9,7 +9,7 @@ import 'package:fquest_engine/engine/scene/widgets/DialogOptionsWidget.dart';
 
 import 'widgets/BackgroundImageWidget.dart';
 import 'widgets/CharacterNameWidget.dart';
-import 'widgets/CharactersSurfaceWidget.dart';
+import 'widgets/characters/CharactersSurfaceWidget.dart';
 import 'widgets/SpeechWidget.dart';
 
 class GSWidget extends ConsumerStatefulWidget {

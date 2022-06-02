@@ -11,6 +11,7 @@ class CharacterEntity {
   late CharacterNode characterNode;
   late Character character;
   late Size size;
+
   Position position = Position(left: 0, bottom: 0);
 
   static Future<CharacterEntity> fromNode(CharacterNode characterNode, Future<EvalResult> Function(BaseNode node) eval) async {

@@ -1,1 +1,1 @@
-{"type":"SCENE","name":"start","prog":{"type":"PROG","prog":[{"type":"JUMP","label":"briefing"}],"anchors":{},"usedAssets":[]}}
+{"type":"SCENE","name":"start","prog":{"type":"PROG","prog":[{"type":"PLAY","playerLabel":"music","assetPath":"assets/sounds/music/office.mp3"},{"type":"JUMP","label":"briefing"}],"anchors":{},"usedAssets":[]}}
