@@ -11,6 +11,8 @@ import 'package:fquest_engine/cmp/ast/nodes/dialog/option/DialogOptionNode.dart'
 import 'package:fquest_engine/cmp/ast/nodes/dialog/option/props/DialogOptionNodeProps.dart';
 import 'package:fquest_engine/cmp/ast/nodes/func/FuncNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/hide/HideNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/hide/props/HideNodeProps.dart';
+import 'package:fquest_engine/cmp/ast/nodes/hide/props/animation/HideNodeAnimation.dart';
 import 'package:fquest_engine/cmp/ast/nodes/if/IfNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/jump/JumpNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/num/NumNode.dart';
@@ -207,6 +209,24 @@ class AstParser extends BaseParser {
     return node != null ? node as T : null;
   }
 
+  Future<HideNode> parseHide() async {
+    helper.skipKeyword(KeywordsMap[EKeyword.HIDE]);
+
+    final characterVarName = helper.parseVarName();
+    final hideNodeProps = HideNodeProps();
+
+    if (helper.isPunc('(') != null) {
+      final props = await parseProps();
+      final hideNodeAnimation = HideNodeAnimation();
+
+      hideNodeAnimation.fadeOutDuration = getPropValue<NumNode>(props['fadeOutDuration'])?.value;
+
+      hideNodeProps.animation = hideNodeAnimation;
+    }
+
+    return HideNode(characterVarName: characterVarName, props: hideNodeProps);
+  }
+
   Future<ShowNode> parseShow() async {
     helper.skipKeyword(KeywordsMap[EKeyword.SHOW]);
     final characterVarName = helper.parseVarName();
@@ -312,8 +332,7 @@ class AstParser extends BaseParser {
         return await parseShow();
       }
       if (helper.isKeyword(KeywordsMap[EKeyword.HIDE]) != null) {
-        tokenStream.next();
-        return HideNode(characterVarName: helper.parseVarName());
+        return await parseHide();
       }
 
       final token = tokenStream.next()!;

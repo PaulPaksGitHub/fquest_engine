@@ -73,7 +73,7 @@ scene briefing {
 
             show card (left: 280, bottom: 305, fadeInDuration: 150)
             narrator "(Получено: Папка с бумагами)"
-            hide card
+            hide card (fadeOutDuration: 150)
 
             jump about_mission
         }
@@ -96,23 +96,23 @@ scene briefing {
             show card_maria (left: 280, bottom: 305, fadeInDuration: 150)
             curator "Мария Соколова - один из наших лучших следователей с большим опытом."
 
+            hide card_maria (fadeOutDuration: 200)
             show card_eugene (left: 280, bottom: 305, fadeInDuration: 150)
             curator "Евгений Волков - специалист в области компьютерной техники, а также подготовленный боец."
 
+            hide card_eugene (fadeOutDuration: 200)
             show card_valeria (left: 280, bottom: 305, fadeInDuration: 150)
             curator "Валерия Высоцкая - полезный кадр со знаниями в области юриспруденции."
 
+            hide card_valeria (fadeOutDuration: 200)
             show card_tamara (left: 280, bottom: 305, fadeInDuration: 150)
             curator "Тамара Халтурина - наш действующий судмедэксперт."
 
+            hide card_tamara (fadeOutDuration: 200)
             show card_albert (left: 280, bottom: 305, fadeInDuration: 150)
             curator "И Альберт Дамагаров, ваш капитан, - опытный оперативник с высоким уровнем боевой подготовки."
 
-            hide card_maria
-            hide card_eugene
-            hide card_valeria
-            hide card_tamara
-            hide card_albert
+            hide card_albert (fadeOutDuration: 200)
 
             jump about_mission
         }

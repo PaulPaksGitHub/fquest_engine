@@ -8,11 +8,13 @@ part of 'HideNode.dart';
 
 HideNode _$HideNodeFromJson(Map<String, dynamic> json) => HideNode(
       characterVarName: json['characterVarName'] as String,
+      props: HideNodeProps.fromJson(json['props'] as Map<String, dynamic>),
     )..type = $enumDecode(_$ENodeTypeEnumMap, json['type']);
 
 Map<String, dynamic> _$HideNodeToJson(HideNode instance) => <String, dynamic>{
       'type': _$ENodeTypeEnumMap[instance.type],
       'characterVarName': instance.characterVarName,
+      'props': instance.props.toJson(),
     };
 
 const _$ENodeTypeEnumMap = {

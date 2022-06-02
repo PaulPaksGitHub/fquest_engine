@@ -260,7 +260,8 @@ class Interpreter {
           final characterEntity = ref
               .read(GSState.characters.notifier)
               .getAssigned(node.characterVarName);
-          ref.read(GSState.characters.notifier).hide(characterEntity);
+
+          AnimationScheduler.broadcastAnimationEvent(characterEntity, node);
         }
 
         return EvalResult(value: true);

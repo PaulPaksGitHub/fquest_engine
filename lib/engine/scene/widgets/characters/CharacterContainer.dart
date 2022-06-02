@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fquest_engine/cmp/ast/nodes/hide/HideNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/hide/props/animation/HideNodeAnimation.dart';
 import 'package:fquest_engine/cmp/ast/nodes/show/props/animation/ShowNodeAnimation.dart';
 import 'package:fquest_engine/engine/scene/entities/CharacterEntity.dart';
 import 'package:fquest_engine/engine/services/animation/AnimationScheduler.dart';
+
+import '../../state/GSState.dart';
 
 class CharacterContainer extends ConsumerStatefulWidget {
   const CharacterContainer(
@@ -20,27 +26,57 @@ class CharacterContainer extends ConsumerStatefulWidget {
 
 class CharacterContainerState extends ConsumerState<CharacterContainer> {
   double opacity = 1;
-  ShowNodeAnimation? animation;
+  Duration opacityDuration = const Duration(milliseconds: 0);
+  ShowNodeAnimation? showAnim;
+  HideNodeAnimation? hideAnim;
 
   Widget wrapOpacity(Widget child) {
-    if (animation != null && animation!.fadeInDuration != null) {
-      return AnimatedOpacity(
-        opacity: opacity,
-        duration: Duration(milliseconds: animation!.fadeInDuration!.toInt()),
-        child: child,
-      );
-    }
-    return child;
+    return AnimatedOpacity(
+      opacity: opacity,
+      duration: opacityDuration,
+      child: child,
+    );
+  }
+
+  late final Function() removeListener;
+
+  @override
+  dispose() {
+    removeListener();
+
+    super.dispose();
   }
 
   @override
   initState() {
     super.initState();
 
-    animation = AnimationScheduler.getAnimation(widget.characterEntity);
-    if (animation != null) {
-      if (animation!.fadeInDuration != null) {
+    removeListener =
+        AnimationScheduler.addListener(widget.characterEntity, (value) {
+          if (value.runtimeType == HideNode) {
+            value as HideNode;
+
+            if (value.props.animation != null) {
+              if (value.props.animation!.fadeOutDuration != null) {
+                setState(() {
+                  opacityDuration = Duration(milliseconds: value.props.animation!.fadeOutDuration!.toInt());
+                  opacity = 0;
+                });
+
+                Future.delayed(Duration(milliseconds: value.props.animation!.fadeOutDuration!.toInt()), () {
+                  ref.read(GSState.characters.notifier).hide(widget.characterEntity);
+                });
+              }
+            }
+          }
+        });
+
+    final showAnim = AnimationScheduler.getAnimation(widget.characterEntity);
+    if (showAnim != null) {
+      if (showAnim!.fadeInDuration != null) {
         opacity = 0;
+        opacityDuration =
+            Duration(milliseconds: showAnim!.fadeInDuration!.toInt());
         WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
           setState(() {
             opacity = 1;
@@ -66,7 +102,8 @@ class CharacterContainerState extends ConsumerState<CharacterContainer> {
           child: SizedBox(
             width: computeSize(che.size.width),
             height: computeSize(che.size.height),
-            child: wrapOpacity(Image(image: AssetImage(che.character.assetPath!))),
+            child: wrapOpacity(
+                Image(image: AssetImage(che.character.assetPath!))),
           )
       );
     }

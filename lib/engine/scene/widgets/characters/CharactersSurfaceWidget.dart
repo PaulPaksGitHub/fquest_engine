@@ -22,7 +22,7 @@ class CharactersSurfaceWidget extends ConsumerWidget {
         right: 0,
         child: Stack(
           children: [for (var character in characters)
-            CharacterContainer(characterEntity: character, computeSize: computeSize)
+            CharacterContainer(key: Key(character.characterNode.varName), characterEntity: character, computeSize: computeSize)
           ],
         ));
   }
