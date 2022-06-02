@@ -4,6 +4,7 @@ import 'package:fquest_engine/cmp/ast/nodes/show/ShowNode.dart';
 import 'package:fquest_engine/engine/scene/entities/DialogOptionEntity.dart';
 import 'package:fquest_engine/engine/scene/entities/SpeechEntity.dart';
 
+import '../../services/animation/AnimationScheduler.dart';
 import '../entities/CharacterEntity.dart';
 import 'GSGlobalState.dart';
 
@@ -127,5 +128,19 @@ class GSState {
 
     option.wasSelected = true;
     ref.read(GSGlobalState.interpreter.notifier).state?.eval(option.onSelectProg, globalEnv);
+  }
+
+  static onPressNext(WidgetRef ref) {
+    final isTextAnimationActive = AnimationScheduler.getAnimation('speechText');
+
+    if (isTextAnimationActive != null && isTextAnimationActive) {
+      AnimationScheduler.scheduleAnimation('speechTextSetFull', true);
+    } else {
+      final speech = ref.read(GSState.speech.notifier).state;
+      if ((speech != null && speech.dialogOptions.isEmpty) ||
+          speech == null) {
+        ref.read(GSGlobalState.interpreter.notifier).state?.evalNext();
+      }
+    }
   }
 }

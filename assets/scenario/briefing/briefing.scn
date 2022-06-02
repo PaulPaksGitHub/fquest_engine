@@ -2,6 +2,8 @@ scene briefing {
     bg "curator_office/city_view.png"
     play ambient "ambient/city.mp3"
     wait
+
+    play music "music/office.mp3"
     bg "curator_office/window.png"
     wait
 
@@ -80,8 +82,7 @@ scene briefing {
         - "Меня больше интересует наш отдел. Могу я задать пару вопросов?" (onceSelectable: true) {
             curator "Нет, вы же немой, мистер Андерсон"
             narrator "С невыностмой болью ваши губы начинают срастаться"
-            narrator "ПРОСНИСЬ"
-            narrator "ПРОСНИСЬ ПРОСНИСЬ ПРОСНИСЬ"
+            narrator "Follow the white rabbit..."
             jump about_mission
         }
         - "Товарищи?" (onceSelectable: true) {
@@ -96,20 +97,20 @@ scene briefing {
             show card_maria (left: 280, bottom: 305, fadeInDuration: 150)
             curator "Мария Соколова - один из наших лучших следователей с большим опытом."
 
-            hide card_maria (fadeOutDuration: 200)
             show card_eugene (left: 280, bottom: 305, fadeInDuration: 150)
+            hide card_maria (fadeOutDuration: 250)
             curator "Евгений Волков - специалист в области компьютерной техники, а также подготовленный боец."
 
-            hide card_eugene (fadeOutDuration: 200)
             show card_valeria (left: 280, bottom: 305, fadeInDuration: 150)
+            hide card_eugene (fadeOutDuration: 250)
             curator "Валерия Высоцкая - полезный кадр со знаниями в области юриспруденции."
 
-            hide card_valeria (fadeOutDuration: 200)
             show card_tamara (left: 280, bottom: 305, fadeInDuration: 150)
+            hide card_valeria (fadeOutDuration: 250)
             curator "Тамара Халтурина - наш действующий судмедэксперт."
 
-            hide card_tamara (fadeOutDuration: 200)
             show card_albert (left: 280, bottom: 305, fadeInDuration: 150)
+            hide card_tamara (fadeOutDuration: 250)
             curator "И Альберт Дамагаров, ваш капитан, - опытный оперативник с высоким уровнем боевой подготовки."
 
             hide card_albert (fadeOutDuration: 200)

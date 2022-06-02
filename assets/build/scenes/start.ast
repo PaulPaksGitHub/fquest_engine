@@ -1,1 +1,1 @@
-{"type":"SCENE","name":"start","prog":{"type":"PROG","prog":[{"type":"PLAY","playerLabel":"music","assetPath":"assets/sounds/music/office.mp3"},{"type":"JUMP","label":"briefing"}],"anchors":{},"usedAssets":[]}}
+{"type":"SCENE","name":"start","prog":{"type":"PROG","prog":[{"type":"HIDE","characterVarName":"all","props":{"animation":null}},{"type":"HIDE","characterVarName":"dialog","props":{"animation":null}},{"type":"JUMP","label":"briefing"}],"anchors":{},"usedAssets":[]}}
