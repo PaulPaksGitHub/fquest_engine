@@ -6,14 +6,20 @@ part of 'ShowNode.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-ShowNode _$ShowNodeFromJson(Map<String, dynamic> json) => ShowNode(
-      characterVarName: json['characterVarName'] as String,
-      props: ShowNodeProps.fromJson(json['props'] as Map<String, dynamic>),
+ShowNode<T> _$ShowNodeFromJson<T extends BaseNode>(Map<String, dynamic> json) =>
+    ShowNode<T>(
+      sprite: BaseNodeConverter<T>().fromJson(json['sprite']),
+      surface: BaseNodeConverter<T>().fromJson(json['surface']),
+      props: ShowNodeProps<BaseNode>.fromJson(
+          json['props'] as Map<String, dynamic>),
     )..type = $enumDecode(_$ENodeTypeEnumMap, json['type']);
 
-Map<String, dynamic> _$ShowNodeToJson(ShowNode instance) => <String, dynamic>{
+Map<String, dynamic> _$ShowNodeToJson<T extends BaseNode>(
+        ShowNode<T> instance) =>
+    <String, dynamic>{
       'type': _$ENodeTypeEnumMap[instance.type],
-      'characterVarName': instance.characterVarName,
+      'surface': BaseNodeConverter<T>().toJson(instance.surface),
+      'sprite': BaseNodeConverter<T>().toJson(instance.sprite),
       'props': instance.props.toJson(),
     };
 
@@ -31,7 +37,6 @@ const _$ENodeTypeEnumMap = {
   ENodeType.RETURN: 'RETURN',
   ENodeType.SCENE: 'SCENE',
   ENodeType.WAIT: 'WAIT',
-  ENodeType.BACKGROUND: 'BACKGROUND',
   ENodeType.CHARACTER: 'CHARACTER',
   ENodeType.SHOW: 'SHOW',
   ENodeType.HIDE: 'HIDE',
@@ -42,4 +47,9 @@ const _$ENodeTypeEnumMap = {
   ENodeType.PLAYER: 'PLAYER',
   ENodeType.PLAY: 'PLAY',
   ENodeType.PAUSE: 'PAUSE',
+  ENodeType.SPRITE: 'SPRITE',
+  ENodeType.ANIMATION: 'ANIMATION',
+  ENodeType.SURFACE: 'SURFACE',
+  ENodeType.CLEAN: 'CLEAN',
+  ENodeType.ANIMATE: 'ANIMATE',
 };

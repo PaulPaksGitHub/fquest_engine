@@ -6,13 +6,14 @@ part 'SpeechNode.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class SpeechNode<T extends BaseNode> extends BaseNode {
-  String characterVarName;
+  @BaseNodeConverter()
+  T character;
   @BaseNodeConverter()
   T text;
   @BaseNodeConverter()
   List<T> dialogOptions;
 
-  SpeechNode({required this.characterVarName, required this.text, this.dialogOptions = const []})
+  SpeechNode({required this.character, required this.text, this.dialogOptions = const []})
       : super(type: ENodeType.SPEECH);
 
   factory SpeechNode.fromJson(Map<String, dynamic> json) =>

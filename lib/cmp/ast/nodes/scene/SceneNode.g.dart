@@ -35,7 +35,6 @@ const _$ENodeTypeEnumMap = {
   ENodeType.RETURN: 'RETURN',
   ENodeType.SCENE: 'SCENE',
   ENodeType.WAIT: 'WAIT',
-  ENodeType.BACKGROUND: 'BACKGROUND',
   ENodeType.CHARACTER: 'CHARACTER',
   ENodeType.SHOW: 'SHOW',
   ENodeType.HIDE: 'HIDE',
@@ -46,4 +45,9 @@ const _$ENodeTypeEnumMap = {
   ENodeType.PLAYER: 'PLAYER',
   ENodeType.PLAY: 'PLAY',
   ENodeType.PAUSE: 'PAUSE',
+  ENodeType.SPRITE: 'SPRITE',
+  ENodeType.ANIMATION: 'ANIMATION',
+  ENodeType.SURFACE: 'SURFACE',
+  ENodeType.CLEAN: 'CLEAN',
+  ENodeType.ANIMATE: 'ANIMATE',
 };

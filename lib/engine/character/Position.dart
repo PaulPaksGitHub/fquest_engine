@@ -16,6 +16,9 @@ class Position {
     if (position.top != null) top = position.top;
     if (position.bottom != null) bottom = position.bottom;
 
+    if (position.top != null) bottom = null;
+    if (position.right != null) left = null;
+
     return this;
   }
 

@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fquest_engine/cmp/ast/nodes/animate/AnimateNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/animation/AnimationNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/assign/AssignNode.dart';
-import 'package:fquest_engine/cmp/ast/nodes/background/BackgroundNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/base/BaseNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/binary/BinaryNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/bool/BoolNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/call/CallNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/character/CharacterNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/clean/CleanNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/func/FuncNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/hide/HideNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/if/IfNode.dart';
@@ -20,13 +22,20 @@ import 'package:fquest_engine/cmp/ast/nodes/return/ReturnNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/scene/SceneNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/show/ShowNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/speech/SpeechNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/sprite/SpriteNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/str/StrNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/surface/SurfaceNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/var/VarNode.dart';
 import 'package:fquest_engine/engine/ast/interpreter/interruptService/InterruptService.dart';
 import 'package:fquest_engine/engine/ast/interpreter/models/EvalResult.dart';
+import 'package:fquest_engine/engine/scene/entities/AnimationEntity.dart';
+import 'package:fquest_engine/engine/scene/entities/AnimationSequencer.dart';
 import 'package:fquest_engine/engine/scene/entities/CharacterEntity.dart';
 import 'package:fquest_engine/engine/scene/entities/SceneEntity.dart';
 import 'package:fquest_engine/engine/scene/entities/SpeechEntity.dart';
+import 'package:fquest_engine/engine/scene/entities/SpriteEntity.dart';
+import 'package:fquest_engine/engine/scene/entities/SurfaceEntiry.dart';
+import 'package:fquest_engine/engine/scene/state/GSContainerState.dart';
 import 'package:fquest_engine/engine/scene/state/GSGlobalState.dart';
 import 'package:fquest_engine/engine/services/animation/AnimationScheduler.dart';
 import 'package:fquest_engine/engine/services/player/PlayerService.dart';
@@ -107,7 +116,7 @@ class Interpreter {
           throw Exception('Undefined value of variable "${names[i]}"');
         }
       }
-      return eval(node.bodyNode, scope);
+      return eval(node.bodyNode, scope, autoLaunchNextProg: false);
     };
   }
 
@@ -115,13 +124,48 @@ class Interpreter {
     final node = interruptService.getNextNode();
 
     if (node != null) {
-      return eval(node.progNode, globalEnv, skipProgPushing: true);
+      return eval(node.progNode, node.progEnv, skipProgPushing: true);
     }
     return EvalResult(value: true);
   }
 
+  Future<AnimationSequencer> evalAnimationSequencer(
+      BaseNode node, Environment env) async {
+    final maybeAnimationSequencer = (await eval(node, env)).value;
+
+    if (maybeAnimationSequencer.runtimeType == AnimationEntity) {
+      return AnimationSequencer(parallel: [maybeAnimationSequencer]);
+    }
+
+    return maybeAnimationSequencer;
+  }
+
+  Future<SpriteEntity> evalSpriteEntity(BaseNode node, Environment env) async {
+    final maybeSpriteEntity = (await eval(node, env)).value;
+
+    if (maybeSpriteEntity.runtimeType == CharacterEntity) {
+      maybeSpriteEntity as CharacterEntity;
+      if (maybeSpriteEntity.sprite == null) {
+        throw Exception(
+            'Unable to get sprite from a character without a sprite property');
+      }
+      return maybeSpriteEntity.sprite!;
+    }
+
+    maybeSpriteEntity as SpriteEntity;
+    return maybeSpriteEntity;
+  }
+
+  Future<EvalResult> evalInherited(BaseNode node) {
+    final progEntity = interruptService.getNextNode();
+    return eval(node, progEntity != null ? progEntity.progEnv : globalEnv);
+  }
+
   Future<EvalResult> eval(BaseNode node, Environment env,
-      {bool skipProgPushing = false}) async {
+      {bool skipProgPushing = false,
+      bool autoLaunchNextProg = true,
+      isTopLevelProg = false}) async {
+    // print(node.type);
     switch (node.type) {
       case ENodeType.NUM:
         return EvalResult(value: (node as NumNode).value);
@@ -167,13 +211,17 @@ class Interpreter {
                 (await eval(node.leftNode, env)).value,
                 (await eval(node.rightNode, env)).value));
       case ENodeType.PROG:
+        node as ProgNode;
         if (!skipProgPushing) {
-          interruptService.progStack.push(node as ProgNode);
+          interruptService.progStack
+              .push(node, isTopLevelProg ? env : env.extend());
         }
 
         final progEntity = interruptService.getNextNode();
 
         if (progEntity != null) {
+          final newEnv = progEntity.progEnv;
+
           if (progEntity.progNode.usedAssets.isNotEmpty) {
             preloadAssets(progEntity.progNode.usedAssets);
           }
@@ -182,55 +230,74 @@ class Interpreter {
               i < progEntity.progNode.prog.length;
               i++) {
             progEntity.lastEvaluatedIndex = i;
-            final res = await eval(progEntity.progNode.prog[i], env);
+            final res = await eval(progEntity.progNode.prog[i], newEnv);
             if (res.isInterrupt) {
               return res;
             }
           }
 
-          evalNext();
+          if (autoLaunchNextProg) {
+            evalNext();
+          }
         }
 
         return EvalResult(value: true);
       case ENodeType.RETURN:
         return eval((node as ReturnNode).returnNode, env);
       case ENodeType.SCENE:
-        ref
-            .read(GSGlobalState.scenes.notifier)
-            .set(SceneEntity.fromNode(node as SceneNode));
+        node as SceneNode;
+        ref.read(GSGlobalState.scenes.notifier).set(SceneEntity.fromNode(node));
 
-        return eval(node.prog, env);
-      case ENodeType.BACKGROUND:
-        ref.read(GSState.backgroundImageAssetPath.notifier).setBackground(
-            (await eval((node as BackgroundNode).assetPath, env)).value);
-        return EvalResult(value: true);
+        return eval(node.prog, globalEnv);
       case ENodeType.WAIT:
         return EvalResult(value: true, isInterrupt: true);
       case ENodeType.CHARACTER:
-        final characterEntity = await CharacterEntity.fromNode(
-            node as CharacterNode, (n) => eval(n, env));
-        ref.read(GSState.characters.notifier).assign(characterEntity);
-        return EvalResult(value: true);
+        node as CharacterNode;
+        final characterEntity =
+            await CharacterEntity.fromNode(node, (n) => eval(n, env));
+
+        env.set(node.label, characterEntity);
+
+        return EvalResult(value: characterEntity);
       case ENodeType.SHOW:
         node as ShowNode;
-        final characterEntity = ref
-            .read(GSState.characters.notifier)
-            .getAssigned(node.characterVarName);
 
-        if (node.props.animation != null) {
-          AnimationScheduler.scheduleAnimation(characterEntity, node.props.animation);
-        }
+        SurfaceEntity surfaceEntity = (await eval(node.surface, env)).value;
+        SpriteEntity spriteEntity = await evalSpriteEntity(node.sprite, env);
 
-        ref.read(GSState.characters.notifier).show(characterEntity, node);
+        ref
+            .read(surfaceEntity.sprites.notifier)
+            .add(surfaceEntity, spriteEntity);
+
+        AnimationSequencer animationSequencer = node.props.animation != null
+            ? await evalAnimationSequencer(node.props.animation!, env)
+            : AnimationSequencer(parallel: []);
+
+        animationSequencer.parallel
+            .insert(0, AnimationEntity(animationName: 'setDefaults', props: {
+          "opacity": node.props.opacity != null
+              ? (await eval(node.props.opacity!, env)).value
+              : null,
+          "scale": node.props.scale != null
+              ? (await eval(node.props.scale!, env)).value
+              : null,
+          "slideX": node.props.slideX != null
+              ? (await eval(node.props.slideX!, env)).value
+              : null,
+          "slideY": node.props.slideY != null
+              ? (await eval(node.props.slideY!, env)).value
+              : null,
+          "position": node.props.position,
+        }));
+
+        AnimationScheduler.scheduleAnimation(spriteEntity, animationSequencer);
+
         return EvalResult(value: true);
       case ENodeType.SPEECH:
         final speech = node as SpeechNode;
-        ref.read(GSState.speech.notifier).set(await SpeechEntity.create(
-            ref: ref,
-            node: speech,
-            eval: (BaseNode n) {
-              return eval(n, env);
-            }));
+        ref
+            .read(GSState.speech.notifier)
+            .set(await SpeechEntity.create(speech, (n) => eval(n, env), env));
         return EvalResult(value: true, isInterrupt: true);
       case ENodeType.DIALOG_OPTION:
         return EvalResult(value: true);
@@ -252,17 +319,26 @@ class Interpreter {
       case ENodeType.HIDE:
         node as HideNode;
 
-        if (node.characterVarName == 'all') {
-          ref.read(GSState.characters.notifier).hideAll();
-        } else if (node.characterVarName == 'dialog') {
-          ref.read(GSState.speech.notifier).set(null);
-        } else {
-          final characterEntity = ref
-              .read(GSState.characters.notifier)
-              .getAssigned(node.characterVarName);
+        SpriteEntity spriteEntity = await evalSpriteEntity(node.sprite, env);
 
-          AnimationScheduler.broadcastAnimationEvent(characterEntity, node);
+        AnimationSequencer animationSequencer = node.props.animation != null
+            ? await evalAnimationSequencer(node.props.animation!, env)
+            : AnimationSequencer(parallel: []);
+
+        double longestAnimationDuration = 0;
+        for (var animation in animationSequencer.parallel) {
+          if (animation.props['duration'] != null &&
+              animation.props['duration'] > longestAnimationDuration) {
+            longestAnimationDuration = animation.props['duration'];
+          }
         }
+
+        animationSequencer.parallel.add(AnimationEntity(
+            animationName: 'delete',
+            props: {"duration": longestAnimationDuration}));
+
+        AnimationScheduler.broadcastAnimationEvent(
+            spriteEntity, animationSequencer);
 
         return EvalResult(value: true);
       case ENodeType.PLAYER:
@@ -276,6 +352,56 @@ class Interpreter {
       case ENodeType.PAUSE:
         final player = PlayerService.get((node as PauseNode).playerLabel);
         player?.pause();
+        return EvalResult(value: true);
+      case ENodeType.SPRITE:
+        node as SpriteNode;
+
+        final spriteEntity =
+            await SpriteEntity.fromNode(node, (n) => eval(n, env));
+        env.set(spriteEntity.label, spriteEntity);
+
+        return EvalResult(value: spriteEntity);
+      case ENodeType.ANIMATION:
+        node as AnimationNode;
+        Map<String, dynamic> entityProps = {};
+        for (var propKey in node.props.keys) {
+          entityProps[propKey] = (await eval(node.props[propKey]!, env)).value;
+        }
+
+        final animationEntity = AnimationEntity(
+            animationName: node.animationName, props: entityProps);
+
+        return EvalResult(value: animationEntity);
+      case ENodeType.SURFACE:
+        node as SurfaceNode;
+        final surfaceEntity =
+            await SurfaceEntity.fromNode(node, (n) => eval(n, env));
+
+        ref.read(GSContainerState.surfaces.notifier).add(surfaceEntity);
+        env.set(surfaceEntity.label, surfaceEntity);
+
+        return EvalResult(value: surfaceEntity);
+      case ENodeType.CLEAN:
+        node as CleanNode;
+        if (node.surface.type == ENodeType.VAR &&
+            (node.surface as VarNode).value == 'dialog') {
+          ref.read(GSState.speech.notifier).set(null);
+        } else {
+          SurfaceEntity surface = (await eval(node.surface, env)).value;
+          ref.read(surface.sprites.notifier).removeAll();
+        }
+
+        return EvalResult(value: true);
+      case ENodeType.ANIMATE:
+        node as AnimateNode;
+
+        SpriteEntity spriteEntity = await evalSpriteEntity(node.sprite, env);
+        AnimationSequencer? animationSequencer =
+            await evalAnimationSequencer(node.animation, env);
+
+        AnimationScheduler.syncScheduleOrBroadcast(
+            spriteEntity, animationSequencer);
+
         return EvalResult(value: true);
     }
   }

@@ -1,11 +1,13 @@
 import 'package:fquest_engine/cmp/ast/nodes/anchor/AnchorNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/animate/AnimateNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/animation/AnimationNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/assign/AssignNode.dart';
-import 'package:fquest_engine/cmp/ast/nodes/background/BackgroundNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/base/BaseNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/binary/BinaryNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/bool/BoolNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/call/CallNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/character/CharacterNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/clean/CleanNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/dialog/option/DialogOptionNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/func/FuncNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/hide/HideNode.dart';
@@ -20,12 +22,14 @@ import 'package:fquest_engine/cmp/ast/nodes/return/ReturnNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/scene/SceneNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/show/ShowNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/speech/SpeechNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/sprite/SpriteNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/str/StrNode.dart';
+import 'package:fquest_engine/cmp/ast/nodes/surface/SurfaceNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/var/VarNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/wait/WaitNode.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-final Map<String, ENodeType> nodesMap = (){
+final Map<String, ENodeType> nodesMap = () {
   Map<String, ENodeType> map = {};
 
   ENodeType.values.forEach((element) {
@@ -70,8 +74,6 @@ class BaseNodeConverter<T> implements JsonConverter<T, Object?> {
           return ReturnNode.fromJson(json) as T;
         case ENodeType.SCENE:
           return SceneNode.fromJson(json) as T;
-        case ENodeType.BACKGROUND:
-          return BackgroundNode.fromJson(json) as T;
         case ENodeType.WAIT:
           return WaitNode.fromJson(json) as T;
         case ENodeType.CHARACTER:
@@ -94,6 +96,16 @@ class BaseNodeConverter<T> implements JsonConverter<T, Object?> {
           return PlayNode.fromJson(json) as T;
         case ENodeType.PAUSE:
           return PauseNode.fromJson(json) as T;
+        case ENodeType.SPRITE:
+          return SpriteNode.fromJson(json) as T;
+        case ENodeType.ANIMATION:
+          return AnimationNode.fromJson(json) as T;
+        case ENodeType.SURFACE:
+          return SurfaceNode.fromJson(json) as T;
+        case ENodeType.CLEAN:
+          return CleanNode.fromJson(json) as T;
+        case ENodeType.ANIMATE:
+          return AnimateNode.fromJson(json) as T;
       }
     }
 

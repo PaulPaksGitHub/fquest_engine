@@ -120,6 +120,7 @@ class TokenStream {
 
   Token? next () {
     Token? token = current;
+    print(token);
     current = null;
     if (token != null) {
       return token;

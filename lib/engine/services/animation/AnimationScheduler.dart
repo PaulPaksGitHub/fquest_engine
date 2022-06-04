@@ -1,13 +1,14 @@
 import 'package:fquest_engine/cmp/streams/UuidStream.dart';
+import 'package:fquest_engine/engine/scene/entities/AnimationSequencer.dart';
 
 
 class AnimationScheduler {
-  static final Map<dynamic, dynamic> _scheduledAnimations = {};
+  static final Map<dynamic, AnimationSequencer> _scheduledAnimations = {};
 
   static final UuidStream _listenersUuid = UuidStream();
-  static final Map<dynamic, Map<int, Function(dynamic value)>> _listeners = {};
+  static final Map<dynamic, Map<int, Function(AnimationSequencer value)>> _listeners = {};
 
-  static Function() addListener (dynamic key, Function(dynamic value) cb) {
+  static Function() addListener (dynamic key, Function(AnimationSequencer value) cb) {
     final id = _listenersUuid.next();
 
     _listeners[key] = {
@@ -20,20 +21,35 @@ class AnimationScheduler {
     };
   }
 
-  static broadcastAnimationEvent(dynamic key, dynamic value) {
+  static broadcastAnimationEvent(dynamic key, AnimationSequencer sequencer) {
     final listeners = _listeners[key];
     if (listeners != null && listeners.keys.isNotEmpty) {
       for (var listener in listeners.values) {
-        listener(value);
+        listener(sequencer);
       }
     }
   }
 
-  static scheduleAnimation (dynamic key, dynamic config) {
-    _scheduledAnimations[key] = config;
+  static syncScheduleOrBroadcast(dynamic key, AnimationSequencer sequencer) {
+    AnimationSequencer? animation = _scheduledAnimations[key];
+    if (animation != null) {
+      scheduleAnimation(key, sequencer);
+    } else {
+      broadcastAnimationEvent(key, sequencer);
+    }
   }
 
-  static dynamic getAnimation(dynamic key) {
+  static scheduleAnimation (dynamic key, AnimationSequencer sequencer) {
+    AnimationSequencer? animation = _scheduledAnimations[key];
+    if (animation != null) {
+      animation.parallel.addAll(sequencer.parallel);
+      print(sequencer.parallel.map((e) => e.animationName));
+    } else {
+      _scheduledAnimations[key] = sequencer;
+    }
+  }
+
+  static AnimationSequencer? getAnimation(dynamic key) {
     final value = _scheduledAnimations[key];
 
     if (_scheduledAnimations.containsKey(key)) {

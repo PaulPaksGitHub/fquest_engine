@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fquest_engine/engine/scene/state/GSContainerState.dart';
 import 'package:fquest_engine/engine/scene/state/GSState.dart';
 import 'package:fquest_engine/engine/scene/widgets/DialogOptionsWidget.dart';
+import 'package:fquest_engine/engine/scene/widgets/surface/SurfacesContainerWidget.dart';
 
-import 'widgets/BackgroundImageWidget.dart';
 import 'widgets/CharacterNameWidget.dart';
 import 'widgets/SpeechWidget.dart';
-import 'widgets/characters/CharactersSurfaceWidget.dart';
 
 class GSWidget extends ConsumerStatefulWidget {
   GSWidget({Key? key, required this.sceneName}) : super(key: key);
@@ -22,10 +22,6 @@ class GSWidget extends ConsumerStatefulWidget {
 }
 
 class GameSceneWidgetState extends ConsumerState<GSWidget> {
-  double computeRealSize(BoxConstraints constraints, double initialSize) {
-    return constraints.minHeight / 1080 * initialSize;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -47,43 +43,47 @@ class GameSceneWidgetState extends ConsumerState<GSWidget> {
             aspectRatio: 1920 / 1080,
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-                double computeSize(double size) {
-                  return computeRealSize(constraints, size);
-                }
+                WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+                  ref.read(GSContainerState.computeSize.notifier).setConstraints(constraints);
+                });
 
-                return Stack(
-                  children: [
-                    BackgroundImageWidget(),
-                    CharactersSurfaceWidget(computeSize: computeSize),
-                    Container(
-                      margin: EdgeInsets.only(
-                          left: computeSize(200.0),
-                          right: computeSize(200.0),
-                          bottom: computeSize(30)),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                  flex: 943,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      CharacterNameWidget(
-                                          computeSize: computeSize),
-                                      SpeechWidget(computeSize: computeSize),
-                                    ],
-                                  )),
-                              DialogOptionsWidget(computeSize: computeSize)
-                            ],
-                          )
-                        ],
-                      ),
-                    )
-                  ],
+                final computeSize = ref.watch(GSContainerState.computeSize);
+
+                return ClipRect(
+                  clipBehavior: Clip.hardEdge,
+                  child: Stack(
+                    children: [
+                      SurfacesContainerWidget(),
+                      Container(
+                        margin: EdgeInsets.only(
+                            left: computeSize(200.0),
+                            right: computeSize(200.0),
+                            bottom: computeSize(30)),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                    flex: 943,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        CharacterNameWidget(
+                                            computeSize: computeSize),
+                                        SpeechWidget(computeSize: computeSize),
+                                      ],
+                                    )),
+                                DialogOptionsWidget(computeSize: computeSize)
+                              ],
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 );
               },
             ),

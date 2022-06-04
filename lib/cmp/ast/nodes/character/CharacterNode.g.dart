@@ -10,17 +10,17 @@ CharacterNode<T> _$CharacterNodeFromJson<T extends BaseNode>(
         Map<String, dynamic> json) =>
     CharacterNode<T>(
       name: BaseNodeConverter<T?>().fromJson(json['name']),
-      assetPath: BaseNodeConverter<T?>().fromJson(json['assetPath']),
-      varName: json['varName'] as String,
+      sprite: BaseNodeConverter<T?>().fromJson(json['sprite']),
+      label: json['label'] as String,
     )..type = $enumDecode(_$ENodeTypeEnumMap, json['type']);
 
 Map<String, dynamic> _$CharacterNodeToJson<T extends BaseNode>(
         CharacterNode<T> instance) =>
     <String, dynamic>{
       'type': _$ENodeTypeEnumMap[instance.type],
-      'varName': instance.varName,
+      'label': instance.label,
       'name': BaseNodeConverter<T?>().toJson(instance.name),
-      'assetPath': BaseNodeConverter<T?>().toJson(instance.assetPath),
+      'sprite': BaseNodeConverter<T?>().toJson(instance.sprite),
     };
 
 const _$ENodeTypeEnumMap = {
@@ -37,7 +37,6 @@ const _$ENodeTypeEnumMap = {
   ENodeType.RETURN: 'RETURN',
   ENodeType.SCENE: 'SCENE',
   ENodeType.WAIT: 'WAIT',
-  ENodeType.BACKGROUND: 'BACKGROUND',
   ENodeType.CHARACTER: 'CHARACTER',
   ENodeType.SHOW: 'SHOW',
   ENodeType.HIDE: 'HIDE',
@@ -48,4 +47,9 @@ const _$ENodeTypeEnumMap = {
   ENodeType.PLAYER: 'PLAYER',
   ENodeType.PLAY: 'PLAY',
   ENodeType.PAUSE: 'PAUSE',
+  ENodeType.SPRITE: 'SPRITE',
+  ENodeType.ANIMATION: 'ANIMATION',
+  ENodeType.SURFACE: 'SURFACE',
+  ENodeType.CLEAN: 'CLEAN',
+  ENodeType.ANIMATE: 'ANIMATE',
 };

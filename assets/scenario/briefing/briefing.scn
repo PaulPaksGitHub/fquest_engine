@@ -1,19 +1,40 @@
 scene briefing {
-    bg "curator_office/city_view.png"
+    showAnimation = animation fadeIn : (duration: 270)
+    hideAnimation = animation fadeOut : (duration: 170)
+
     play ambient "ambient/city.mp3"
+    sprite city_view : (assetPath: "background/curator_office/city_view.png")
+    sprite birds : (assetPath: "background/curator_office/birds.gif")
+
+    show bgOverlay city_view : (scale: 1.26, slideY: -0.1)
+    show bgOverlay birds : (top: 148)
     wait
 
     play music "music/office.mp3"
-    bg "curator_office/window.png"
+
+    _dur = 1700
+    _fadeOutIntro = animation fadeOut : (duration: 550)
+    animate city_view parallel(animation scale : (scale: 1, duration: _dur), animation slide : (slideY: 0.1, duration: _dur))
+    hide birds : (animation: parallel(animation scale : (scale: 0.8, duration: _dur), _fadeOutIntro))
+
+    show bgOverlay sprite _window : (assetPath: "background/curator_office/window.png") : (opacity: 0, animation: animation fadeIn : (duration: _dur))
+    show bgOverlay sprite _window_arc : (assetPath: "background/curator_office/window_arc.png") : (opacity: 0, animation: animation fadeIn : (duration: _dur), left: 837)
     wait
 
+
+    show bg sprite _room : (assetPath: "background/curator_office/room.png")
+    show ch curator : (left: 1174)
+
     play ambient "ambient/office_aircon.mp3"
-    bg "curator_office/room.png"
-    show curator (left: 1174)
+
+    hide city_view : (animation: _fadeOutIntro)
+    hide birds : (animation: _fadeOutIntro)
+    hide _window_arc : (animation: _fadeOutIntro)
+    hide _window : (animation: _fadeOutIntro)
 
     anchor welcome
     curator "Здравствуйте. Рад, что вы пришли. Отделу номер 13 всегда требуются новые сотрудники."
-        - "Отдел номер 13?" (onceSelectable: true) {
+        - "Отдел номер 13?" : (onceSelectable: true) {
             narrator "СПРАВКА"
             jump welcome
         }
@@ -25,9 +46,7 @@ scene briefing {
 
     anchor about_mission
     curator "Ваши товарищи уже прошли основной брифинг, поэтому я введу вас в курс дела, а они посвятят в детали."
-        - "Расскажите мне о деле, люблю когда все последовательно." (onceSelectable: true) {
-            character card (assetPath: "personal_card/closed.png")
-
+        - "Расскажите мне о деле, люблю когда все последовательно." : (onceSelectable: true) {
             curator "В западном районе города на улице Авиационной в квартире, принадлежащей Валентину Бадылеву, обнаружен труп мужчины."
                 - "Можете подробнее описать внешность погишего?" {
                     curator "В ходе осмотра патологоанатомом выяснилось следующее:
@@ -71,49 +90,58 @@ scene briefing {
                 curator "В ходе беглого осмотра обнаружилось, что вся не прикрученная к полу мебель была перевернута, а то, что перевернуть не удалось, посыпано солью. Также конструкция и ремонт в квартире позволили - предположительно Бадылеву - затопить пол в коридоре и кухне водой, при этом сделав это так, чтобы соседи не пострадали и уровень воды не падал."
             }
 
+            sprite folder : (assetPath: "items/folder_with_docs.png")
+            show bgOverlay folder : (
+                animation: parallel(animation fadeIn : (duration: 470), animation slide : (slideX: 0.15, duration: 470)),
+                opacity: 0,
+                slideX: -0.15,
+                left: 200,
+                top: 78
+            )
+
             curator "В этой папке вы найдёте дополнительную информацию, заключение патологоанатома и план квартиры."
 
-            show card (left: 280, bottom: 305, fadeInDuration: 150)
-            narrator "(Получено: Папка с бумагами)"
-            hide card (fadeOutDuration: 150)
+            hide folder : (
+                animation: parallel(animation fadeOut : (duration: 470), animation slide : (slideX: -0.15, duration: 470))
+            )
 
             jump about_mission
         }
-        - "Меня больше интересует наш отдел. Могу я задать пару вопросов?" (onceSelectable: true) {
+        - "Меня больше интересует наш отдел. Могу я задать пару вопросов?" : (onceSelectable: true) {
             curator "Нет, вы же немой, мистер Андерсон"
             narrator "С невыностмой болью ваши губы начинают срастаться"
             narrator "Follow the white rabbit..."
             jump about_mission
         }
-        - "Товарищи?" (onceSelectable: true) {
-            character card_maria (assetPath: "personal_card/maria.png")
-            character card_eugene (assetPath: "personal_card/eugene.png")
-            character card_valeria (assetPath: "personal_card/valeria.png")
-            character card_tamara (assetPath: "personal_card/tamara.png")
-            character card_albert (assetPath: "personal_card/albert.png")
+        - "Товарищи?" : (onceSelectable: true) {
+            sprite card_maria : (assetPath: "objects/personal_card/maria.png")
+            sprite card_eugene : (assetPath: "objects/personal_card/eugene.png")
+            sprite card_valeria : (assetPath: "objects/personal_card/valeria.png")
+            sprite card_tamara : (assetPath: "objects/personal_card/tamara.png")
+            sprite card_albert : (assetPath: "objects/personal_card/albert.png")
 
             curator "На этом деле с вами в команде будет еще пять оперативников."
 
-            show card_maria (left: 280, bottom: 305, fadeInDuration: 150)
+            show bgOverlay card_maria : (left: 280, bottom: 305, animation: showAnimation, opacity: 0)
             curator "Мария Соколова - один из наших лучших следователей с большим опытом."
 
-            show card_eugene (left: 280, bottom: 305, fadeInDuration: 150)
-            hide card_maria (fadeOutDuration: 250)
+            show bgOverlay card_eugene : (left: 280, bottom: 305, animation: showAnimation, opacity: 0)
             curator "Евгений Волков - специалист в области компьютерной техники, а также подготовленный боец."
 
-            show card_valeria (left: 280, bottom: 305, fadeInDuration: 150)
-            hide card_eugene (fadeOutDuration: 250)
+            show bgOverlay card_valeria : (left: 280, bottom: 305, animation: showAnimation, opacity: 0)
             curator "Валерия Высоцкая - полезный кадр со знаниями в области юриспруденции."
 
-            show card_tamara (left: 280, bottom: 305, fadeInDuration: 150)
-            hide card_valeria (fadeOutDuration: 250)
+            show bgOverlay card_tamara : (left: 280, bottom: 305, animation: showAnimation, opacity: 0)
             curator "Тамара Халтурина - наш действующий судмедэксперт."
 
-            show card_albert (left: 280, bottom: 305, fadeInDuration: 150)
-            hide card_tamara (fadeOutDuration: 250)
+            show bgOverlay card_albert : (left: 280, bottom: 305, animation: showAnimation, opacity: 0)
             curator "И Альберт Дамагаров, ваш капитан, - опытный оперативник с высоким уровнем боевой подготовки."
 
-            hide card_albert (fadeOutDuration: 200)
+            hide card_eugene : (animation: hideAnimation)
+            hide card_valeria : (animation: hideAnimation)
+            hide card_tamara : (animation: hideAnimation)
+            hide card_maria : (animation: hideAnimation)
+            hide card_albert : (animation: animation fadeOut : (duration: 300))
 
             jump about_mission
         }

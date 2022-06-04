@@ -6,14 +6,13 @@ part of 'HideNodeProps.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-HideNodeProps _$HideNodePropsFromJson(Map<String, dynamic> json) =>
-    HideNodeProps()
-      ..animation = json['animation'] == null
-          ? null
-          : HideNodeAnimation.fromJson(
-              json['animation'] as Map<String, dynamic>);
+HideNodeProps<T> _$HideNodePropsFromJson<T extends BaseNode>(
+        Map<String, dynamic> json) =>
+    HideNodeProps<T>()
+      ..animation = BaseNodeConverter<T?>().fromJson(json['animation']);
 
-Map<String, dynamic> _$HideNodePropsToJson(HideNodeProps instance) =>
+Map<String, dynamic> _$HideNodePropsToJson<T extends BaseNode>(
+        HideNodeProps<T> instance) =>
     <String, dynamic>{
-      'animation': instance.animation?.toJson(),
+      'animation': BaseNodeConverter<T?>().toJson(instance.animation),
     };

@@ -19,7 +19,6 @@ enum ENodeType {
   // ENGINE SPECIFIC
   SCENE,
   WAIT,
-  BACKGROUND,
   CHARACTER,
   SHOW,
   HIDE,
@@ -29,7 +28,12 @@ enum ENodeType {
   JUMP,
   PLAYER,
   PLAY,
-  PAUSE
+  PAUSE,
+  SPRITE,
+  ANIMATION,
+  SURFACE,
+  CLEAN,
+  ANIMATE,
 }
 
 @JsonSerializable()

@@ -1,6 +1,5 @@
 enum EKeyword {
   SCENE,
-  BG,
   CHARACTER,
   SHOW,
   WAIT,
@@ -16,7 +15,12 @@ enum EKeyword {
   RETURN,
   PLAYER,
   PLAY,
-  PAUSE
+  PAUSE,
+  SPRITE,
+  ANIMATION,
+  SURFACE,
+  CLEAN,
+  ANIMATE
 }
 
 const KeywordsMap = {
@@ -26,7 +30,6 @@ const KeywordsMap = {
   EKeyword.FALSE: 'false',
   EKeyword.ELSE: 'else',
   EKeyword.SCENE: 'scene',
-  EKeyword.BG: 'bg',
   EKeyword.CHARACTER: 'character',
   EKeyword.SHOW: 'show',
   EKeyword.WAIT: 'wait',
@@ -37,4 +40,9 @@ const KeywordsMap = {
   EKeyword.PLAYER: 'player',
   EKeyword.PLAY: 'play',
   EKeyword.PAUSE: 'pause',
+  EKeyword.SPRITE: 'sprite',
+  EKeyword.ANIMATION: 'animation',
+  EKeyword.SURFACE: 'surface',
+  EKeyword.CLEAN: 'clean',
+  EKeyword.ANIMATE: 'animate',
 };

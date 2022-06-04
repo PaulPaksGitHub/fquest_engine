@@ -6,13 +6,13 @@ part 'CharacterNode.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class CharacterNode<T extends BaseNode> extends BaseNode {
-  CharacterNode({this.name, this.assetPath, required this.varName}) : super(type: ENodeType.CHARACTER);
+  CharacterNode({this.name, this.sprite, required this.label}) : super(type: ENodeType.CHARACTER);
 
-  String varName;
+  String label;
   @BaseNodeConverter()
   T? name;
   @BaseNodeConverter()
-  T? assetPath;
+  T? sprite;
 
   factory CharacterNode.fromJson(Map<String, dynamic> json) =>
       _$CharacterNodeFromJson(json);

@@ -1,9 +1,10 @@
-import 'package:fquest_engine/cmp/ast/nodes/base/BaseNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/prog/ProgNode.dart';
+import 'package:fquest_engine/engine/ast/interpreter/environment/Environment.dart';
 
 class ProgEntity {
-  ProgEntity({required this.progNode});
+  ProgEntity({required this.progNode, required Environment this.progEnv});
 
+  Environment progEnv;
   ProgNode progNode;
   int lastEvaluatedIndex = -1;
 }
@@ -11,8 +12,8 @@ class ProgEntity {
 class ProgStack {
   List<ProgEntity> progs = [];
 
-  push(ProgNode progNode) {
-    progs.insert(0, ProgEntity(progNode: progNode));
+  push(ProgNode progNode, Environment progEnv) {
+    progs.insert(0, ProgEntity(progNode: progNode, progEnv: progEnv));
   }
 
   pop() {
@@ -33,7 +34,7 @@ class InterruptService {
 
   ProgStack progStack = ProgStack();
 
-  int getAnchorIndex (String anchorLabel) {
+  int getAnchorIndex(String anchorLabel) {
     final prog = progStack.getProgEntity();
     int? index = prog?.progNode.anchors[anchorLabel];
     return index ?? -1;
@@ -59,7 +60,9 @@ class InterruptService {
   ProgEntity? getNextNode() {
     if (!progStack.isEmpty()) {
       final progEntity = progStack.getProgEntity();
-      if (progEntity != null && progEntity.progNode.prog.length - 1 == progEntity.lastEvaluatedIndex) {
+      if (progEntity != null &&
+          progEntity.progNode.prog.length - 1 ==
+              progEntity.lastEvaluatedIndex) {
         progStack.pop();
         return getNextNode();
       }

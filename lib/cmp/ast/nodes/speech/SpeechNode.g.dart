@@ -9,7 +9,7 @@ part of 'SpeechNode.dart';
 SpeechNode<T> _$SpeechNodeFromJson<T extends BaseNode>(
         Map<String, dynamic> json) =>
     SpeechNode<T>(
-      characterVarName: json['characterVarName'] as String,
+      character: BaseNodeConverter<T>().fromJson(json['character']),
       text: BaseNodeConverter<T>().fromJson(json['text']),
       dialogOptions: (json['dialogOptions'] as List<dynamic>?)
               ?.map(BaseNodeConverter<T>().fromJson)
@@ -21,7 +21,7 @@ Map<String, dynamic> _$SpeechNodeToJson<T extends BaseNode>(
         SpeechNode<T> instance) =>
     <String, dynamic>{
       'type': _$ENodeTypeEnumMap[instance.type],
-      'characterVarName': instance.characterVarName,
+      'character': BaseNodeConverter<T>().toJson(instance.character),
       'text': BaseNodeConverter<T>().toJson(instance.text),
       'dialogOptions':
           instance.dialogOptions.map(BaseNodeConverter<T>().toJson).toList(),
@@ -41,7 +41,6 @@ const _$ENodeTypeEnumMap = {
   ENodeType.RETURN: 'RETURN',
   ENodeType.SCENE: 'SCENE',
   ENodeType.WAIT: 'WAIT',
-  ENodeType.BACKGROUND: 'BACKGROUND',
   ENodeType.CHARACTER: 'CHARACTER',
   ENodeType.SHOW: 'SHOW',
   ENodeType.HIDE: 'HIDE',
@@ -52,4 +51,9 @@ const _$ENodeTypeEnumMap = {
   ENodeType.PLAYER: 'PLAYER',
   ENodeType.PLAY: 'PLAY',
   ENodeType.PAUSE: 'PAUSE',
+  ENodeType.SPRITE: 'SPRITE',
+  ENodeType.ANIMATION: 'ANIMATION',
+  ENodeType.SURFACE: 'SURFACE',
+  ENodeType.CLEAN: 'CLEAN',
+  ENodeType.ANIMATE: 'ANIMATE',
 };

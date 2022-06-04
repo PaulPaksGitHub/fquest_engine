@@ -6,14 +6,18 @@ part of 'HideNode.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-HideNode _$HideNodeFromJson(Map<String, dynamic> json) => HideNode(
-      characterVarName: json['characterVarName'] as String,
-      props: HideNodeProps.fromJson(json['props'] as Map<String, dynamic>),
+HideNode<T> _$HideNodeFromJson<T extends BaseNode>(Map<String, dynamic> json) =>
+    HideNode<T>(
+      sprite: BaseNodeConverter<T>().fromJson(json['sprite']),
+      props: HideNodeProps<BaseNode>.fromJson(
+          json['props'] as Map<String, dynamic>),
     )..type = $enumDecode(_$ENodeTypeEnumMap, json['type']);
 
-Map<String, dynamic> _$HideNodeToJson(HideNode instance) => <String, dynamic>{
+Map<String, dynamic> _$HideNodeToJson<T extends BaseNode>(
+        HideNode<T> instance) =>
+    <String, dynamic>{
       'type': _$ENodeTypeEnumMap[instance.type],
-      'characterVarName': instance.characterVarName,
+      'sprite': BaseNodeConverter<T>().toJson(instance.sprite),
       'props': instance.props.toJson(),
     };
 
@@ -31,7 +35,6 @@ const _$ENodeTypeEnumMap = {
   ENodeType.RETURN: 'RETURN',
   ENodeType.SCENE: 'SCENE',
   ENodeType.WAIT: 'WAIT',
-  ENodeType.BACKGROUND: 'BACKGROUND',
   ENodeType.CHARACTER: 'CHARACTER',
   ENodeType.SHOW: 'SHOW',
   ENodeType.HIDE: 'HIDE',
@@ -42,4 +45,9 @@ const _$ENodeTypeEnumMap = {
   ENodeType.PLAYER: 'PLAYER',
   ENodeType.PLAY: 'PLAY',
   ENodeType.PAUSE: 'PAUSE',
+  ENodeType.SPRITE: 'SPRITE',
+  ENodeType.ANIMATION: 'ANIMATION',
+  ENodeType.SURFACE: 'SURFACE',
+  ENodeType.CLEAN: 'CLEAN',
+  ENodeType.ANIMATE: 'ANIMATE',
 };

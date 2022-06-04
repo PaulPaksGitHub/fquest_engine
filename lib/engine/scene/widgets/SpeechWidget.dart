@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fquest_engine/engine/scene/entities/AnimationEntity.dart';
+import 'package:fquest_engine/engine/scene/entities/AnimationSequencer.dart';
 import 'package:fquest_engine/engine/scene/entities/SpeechEntity.dart';
 import 'package:fquest_engine/engine/services/animation/AnimationScheduler.dart';
 
@@ -18,39 +20,46 @@ class SpeechWidget extends ConsumerStatefulWidget {
   }
 }
 
-class _SpeechWidgetState extends ConsumerState<SpeechWidget> {
+class _SpeechWidgetState extends ConsumerState<SpeechWidget> with TickerProviderStateMixin {
   String speechText = '';
 
   SpeechEntity? currentSpeech;
 
   setText(SpeechEntity? entity) async {
     if (entity != null) {
-      setState((){ speechText = ''; });
+      setState(() {
+        speechText = '';
+      });
       currentSpeech = entity;
 
-      AnimationScheduler.scheduleAnimation('speechText', true);
+      AnimationScheduler.scheduleAnimation(
+          'speechText',
+          AnimationSequencer(parallel: [
+            AnimationEntity(animationName: 'speechText', props: {})
+          ]));
 
       for (int i = 0; i < entity.text.length; i++) {
-        if (entity != currentSpeech || speechText.length >= entity.text.length) return;
+        if (entity != currentSpeech || speechText.length >= entity.text.length)
+          return;
 
         final symbol = entity.text[i];
         await Future.delayed(const Duration(milliseconds: 15), () async {
-          final needSetFull = AnimationScheduler.getAnimation('speechTextSetFull');
+          final needSetFull =
+              AnimationScheduler.getAnimation('speechTextSetFull');
 
-          if (needSetFull != null && needSetFull) {
+          if (needSetFull != null) {
             setState(() {
               if (entity == currentSpeech) {
                 speechText = entity.text;
               }
             });
           } else {
-            setState((){
+            setState(() {
               if (entity == currentSpeech) {
                 speechText += symbol;
               }
             });
           }
-
         });
       }
 
@@ -59,7 +68,7 @@ class _SpeechWidgetState extends ConsumerState<SpeechWidget> {
   }
 
   @override
-  initState () {
+  initState() {
     super.initState();
   }
 
@@ -73,27 +82,32 @@ class _SpeechWidgetState extends ConsumerState<SpeechWidget> {
     });
 
     if (speech != null) {
-      return ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: computeSize(180.0),
-          minWidth: double.maxFinite,
-        ),
-        child: Container(
-          child: Text(
-            speechText,
-            style: TextStyle(
-              fontSize: computeSize(20.0),
-              height: 30 / 20,
-              fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w600,
-              color: ColorsScheme.replicaText,
-            ),
+      return AnimatedSize(
+        vsync: this,
+        duration: const Duration(milliseconds: 200),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: computeSize(180.0),
+            minWidth: computeSize(943.0),
+            maxWidth: computeSize(943.0),
           ),
-          decoration: BoxDecoration(
-              color: ColorsScheme.replicaAreaBackground,
-              borderRadius: BorderRadius.circular(5)),
-          padding: EdgeInsets.symmetric(
-              vertical: computeSize(30.0), horizontal: computeSize(40.0)),
+          child: Container(
+            child: Text(
+              speechText,
+              style: TextStyle(
+                fontSize: computeSize(20.0),
+                height: 30 / 20,
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.w600,
+                color: ColorsScheme.replicaText,
+              ),
+            ),
+            decoration: BoxDecoration(
+                color: ColorsScheme.replicaAreaBackground,
+                borderRadius: BorderRadius.circular(5)),
+            padding: EdgeInsets.symmetric(
+                vertical: computeSize(30.0), horizontal: computeSize(40.0)),
+          ),
         ),
       );
     }

@@ -14,7 +14,7 @@ class CharacterNameWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final speech = ref.watch(GSState.speech);
 
-    if (speech != null && speech.character.character.name != null) {
+    if (speech != null && speech.character.name != null) {
       return Container(
         decoration: BoxDecoration(
             color: ColorsScheme.characterNameBackground,
@@ -23,7 +23,7 @@ class CharacterNameWidget extends ConsumerWidget {
             horizontal: computeSize(30.0), vertical: computeSize(20.0)),
         margin: EdgeInsets.only(bottom: computeSize(10.0)),
         child: Text(
-          speech.character.character.name!,
+          speech.character.name!,
           style: TextStyle(
             fontSize: computeSize(24.0),
             height: 30 / 24,

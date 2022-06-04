@@ -32,11 +32,12 @@ flutter:
   assets:
     - assets/build/
     - assets/build/scenes/
-    - assets/background/
-    - assets/background/curator_office/
-    - assets/background/car/
-    - assets/character/curator/
-    - assets/character/personal_card/
+    - assets/sprite/background/
+    - assets/sprite/background/curator_office/
+    - assets/sprite/background/car/
+    - assets/sprite/character/curator/
+    - assets/sprite/objects/personal_card/
+    - assets/sprite/items/
     - assets/sounds/ambient/
     - assets/sounds/music/
     - assets/scenario/

@@ -5,6 +5,7 @@ import 'package:fquest_engine/cmp/ast/nodes/base/BaseNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/dialog/option/DialogOptionNode.dart';
 import 'package:fquest_engine/cmp/ast/nodes/dialog/option/props/DialogOptionNodeProps.dart';
 import 'package:fquest_engine/cmp/ast/nodes/speech/SpeechNode.dart';
+import 'package:fquest_engine/engine/ast/interpreter/environment/Environment.dart';
 import 'package:fquest_engine/engine/ast/interpreter/models/EvalResult.dart';
 
 class DialogOptionEntity {
@@ -19,18 +20,19 @@ class DialogOptionEntity {
   }
 
   DialogOptionEntity(
-      {required this.title, required this.onSelectProg, required this.props});
+      {required this.title, required this.onSelectProg, required this.props, required this.environment});
 
   String title;
   BaseNode onSelectProg;
+  Environment environment;
 
   DialogOptionNodeProps props;
 
   bool wasSelected = false;
   bool isAvailable = true;
 
-  static Future<List<DialogOptionEntity>> create(WidgetRef ref, SpeechNode node,
-      Future<EvalResult> Function(BaseNode) eval) async {
+  static Future<List<DialogOptionEntity>> create(SpeechNode node,
+      Future<EvalResult> Function(BaseNode) eval, Environment env) async {
     List<DialogOptionEntity> options = [];
     List<DialogOptionEntity>? cached = _cachedEntities[node];
 
@@ -40,6 +42,7 @@ class DialogOptionEntity {
       final entity = DialogOptionEntity(
           title: (await eval(option.text)).value,
           onSelectProg: option.onSelectProg,
+          environment: env,
           props: option.props);
 
       if (option.props.condition != null) {
