@@ -129,11 +129,7 @@ class _SpriteWidgetState extends ConsumerState<SpriteWidget>
 
     bind(() => setState((){
       offsetDuration = Duration(milliseconds: durationMs);
-      print(offset);
-
       offset += Offset(slideX ?? 0, slideY ?? 0);
-
-      print(offset);
     }));
   }
 
